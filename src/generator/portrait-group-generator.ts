@@ -5,9 +5,12 @@ import {
 
 import { PortraitGroup } from "../portrait-group";
 import { PortraitNode } from "../portrait-node";
+import { ConditionResolver } from "./condition-resolver";
 
 export class PortraitGroupGenerator {
     static generate(group: PortraitGroup, outputPath: string): ModFile[] {
+        const resolvedNodes = ConditionResolver.resolve(group.children);
+        
         const files: ModFile[] = [];
         for (const node of group.children) {
             files.push(
@@ -33,9 +36,10 @@ export class PortraitGroupGenerator {
         } 
         
         const currentPath = [...nodePath, node.name];
+        const id = currentPath.join("_");
         if (!node.portraits) {
             throw new Error(
-                `Cannot generate portrait node "${currentPath.join("_")}" because it has no portraits or subnodes with portraits. This node currently serves no purpose`
+                `Cannot generate portrait node "${id}" because it has no portraits or subnodes with portraits. This node currently serves no purpose`
             );
         }
         
@@ -51,18 +55,12 @@ export class PortraitGroupGenerator {
                 )
             )
         }
-        
-        if (node.scopes.length < 1) {
-            console.warn(`Portrait node "${currentPath.join("_")}" has no scopes: skipping generation`);
-            return files;
-        } 
-        
+                
         if(node.portraits.portraits.length < 1) {
-            console.warn(`Portrait node "${currentPath.join("_")}" has no portraits: skipping generation`);
+            console.warn(`Portrait node "${id}" has no portraits: skipping generation`);
             return files;
         }
-
-
+        
         const file = new ModFile(
             outputPath,
             `${currentPath.join("_")}.txt`
@@ -70,7 +68,7 @@ export class PortraitGroupGenerator {
 
         const portraitImports = file.addContainer("portraits");          
         for (const [i, portrait] of node.portraits.portraits.entries()) {
-            const portraitImport = portraitImports.addContainer(`${currentPath.join("_")}_${i}`);
+            const portraitImport = portraitImports.addContainer(`${id}_${i}`);
             portraitImport.addClause("texturefile", portrait);
         }
 
@@ -78,7 +76,7 @@ export class PortraitGroupGenerator {
 
         const group = portraitGroups.addContainer(groupName);
 
-        group.addClause("default", keyword(`${currentPath.join("_")}_0`));
+        group.addClause("default", keyword(`${id}_0`));
 
         for (const scopeEntity of node.scopes) {
             const scope = group.addContainer(scopeEntity.scope);
@@ -94,7 +92,7 @@ export class PortraitGroupGenerator {
             const portraits = add.addContainer("portraits");
 
             for (const portrait in node.portraits.portraits) {
-                portraits.addUnit(`${currentPath.join("_")}_${portrait}`);
+                portraits.addUnit(`${id}_${portrait}`);
             }
         }
         

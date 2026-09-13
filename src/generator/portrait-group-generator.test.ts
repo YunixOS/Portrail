@@ -31,4 +31,20 @@ describe("PortraitGroupGenerator", () => {
 
         expect(files).toHaveLength(1);
     });
+    
+    it("throws when a node has no portraits", () => {
+        const group = new PortraitGroup(
+            "./mod/gfx/models/portraits",
+            "default"
+        );
+
+        group.addNode("cyborg");
+
+        expect(() => {
+            PortraitGroupGenerator.generate(
+                group,
+                "./output"
+            );
+        }).toThrow();
+    });
 });
