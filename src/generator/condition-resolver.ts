@@ -1,36 +1,47 @@
+import { PortraitGroup } from "../portrait-group";
 import { PortraitNode } from "../portrait-node";
 import { Clause, Container, Keyword, Node } from "@yunixos/paradoxical";
 
-interface ResolvedNode {
+export interface ResolvedNode {
     node: PortraitNode;
+    path: string[];
     positiveConditions: Node[];
     negativeConditions: Node[];
 }
 
 export class ConditionResolver {
-    static resolve(nodeTree: PortraitNode[]): ResolvedNode[] {
-        const flattenedNodes = this.flattenNodeTree(nodeTree);
-        const resolvedNodes = this.resolveNegativeConditions(flattenedNodes);
-        return resolvedNodes;
+    static resolve(portraitGroup: PortraitGroup): ResolvedNode[] {
+        const flattenedNodes = this.flattenNodeTree(
+            portraitGroup.children,
+            [],
+            [portraitGroup.name]
+        );
+        
+        return this.resolveNegativeConditions(flattenedNodes);
     }
 
     private static flattenNodeTree(
         nodeTree: PortraitNode[], 
         inheritedConditions: Node[] = [],
-    ): ResolvedNode[] { 
-        const flattenedTree: ResolvedNode[] = [];
+        nodePath: string[] = []
+    ): ResolvedNode[] {
+        const flattenedTree: ResolvedNode[] = []; 
         for(const node of nodeTree) {
+            const currentPath = [...nodePath, node.name];
+            
             const conditions = [...inheritedConditions, ...node.conditions];
             flattenedTree.push({
                 node: node,
+                path: currentPath,
                 positiveConditions: conditions,
-                negativeConditions: []
+                negativeConditions: [],
             });
             
             flattenedTree.push(
                 ...this.flattenNodeTree(
                     node.children, 
-                    conditions
+                    conditions,
+                    currentPath
                 )
             );
         }

@@ -1,17 +1,16 @@
-import { PortraitNode } from "../portrait-node";
+import { PortraitGroup } from "../portrait-group";
 import { ConditionResolver } from "./condition-resolver";
 
 describe("ConditionResolver", () => {
     test("adds more specific conditions as negative conditions", () => {
-        const scientist = new PortraitNode("scientist");
+        const pg = new PortraitGroup("./mod", "pg");
+        const scientist = pg.addNode("scientist");
         scientist.addConditionClause("has_trait", "trait_scientist");
 
         const genius = scientist.addNode("genius");
         genius.addConditionClause("has_trait", "trait_genius");
 
-        const resolved = ConditionResolver.resolve(
-            [scientist]
-        );
+        const resolved = ConditionResolver.resolve(pg);
 
         expect(resolved).toHaveLength(2);
 
@@ -36,7 +35,8 @@ describe("ConditionResolver", () => {
     });
     
     test("does not exclude nodes with identical condition sets", () => {
-        const scientist = new PortraitNode("scientist");
+        const pg = new PortraitGroup("./mod", "pg");
+        const scientist = pg.addNode("scientist");
         scientist.addConditionClause("has_trait", "trait_scientist");
 
         const careless = scientist.addNode("carefree");
@@ -45,7 +45,7 @@ describe("ConditionResolver", () => {
         const lazy = scientist.addNode("lazy");
         lazy.addConditionClause("has_trait", "trait_carefree");
 
-        const resolved = ConditionResolver.resolve([scientist]);
+        const resolved = ConditionResolver.resolve(pg);
 
         const resolvedCareless = resolved.find(
             node => node.node === careless
@@ -60,7 +60,8 @@ describe("ConditionResolver", () => {
     });
     
     test("does not exclude incomparable condition sets", () => {
-        const scientist = new PortraitNode("scientist");
+        const pg = new PortraitGroup("./mod", "pg");
+        const scientist = pg.addNode("scientist");
         scientist.addConditionClause("has_trait", "trait_scientist");
 
         const a = scientist.addNode("a");
@@ -72,7 +73,7 @@ describe("ConditionResolver", () => {
         b.addConditionClause("has_trait", "trait_aggressive");
         b.addConditionClause("has_trait", "trait_carefree");
 
-        const resolved = ConditionResolver.resolve([scientist]);
+        const resolved = ConditionResolver.resolve(pg);
 
         const resolvedA = resolved.find(node => node.node === a);
         const resolvedB = resolved.find(node => node.node === b);
@@ -82,7 +83,8 @@ describe("ConditionResolver", () => {
     });
     
     test("only excludes additional conditions of a more specific node", () => {
-        const scientist = new PortraitNode("scientist");
+        const pg = new PortraitGroup("./mod", "pg");
+        const scientist = pg.addNode("scientist");
         scientist.addConditionClause("has_trait", "trait_scientist");
 
         const a = scientist.addNode("a");
@@ -98,7 +100,7 @@ describe("ConditionResolver", () => {
         c.addConditionClause("has_trait", "trait_genius");
         c.addConditionClause("has_trait", "trait_aggressive");
 
-        const resolved = ConditionResolver.resolve([scientist]);
+        const resolved = ConditionResolver.resolve(pg);
 
         const resolvedScientist = resolved.find(node => node.node === scientist);
         const resolvedA = resolved.find(node => node.node === a);
@@ -119,14 +121,15 @@ describe("ConditionResolver", () => {
     });
     
     test("groups negative conditions for the same node", () => {
-        const scientist = new PortraitNode("scientist");
+        const pg = new PortraitGroup("./mod", "pg");
+        const scientist = pg.addNode("scientist");
         scientist.addConditionClause("has_trait", "trait_scientist");
 
         const a = scientist.addNode("a");
         a.addConditionClause("has_trait", "trait_genius");
         a.addConditionClause("has_trait", "trait_cool");
         
-        const resolved = ConditionResolver.resolve([scientist]);
+        const resolved = ConditionResolver.resolve(pg);
         const resolvedScientist = resolved.find(node => node.node === scientist);
         
         expect(resolvedScientist!.negativeConditions).toHaveLength(1);

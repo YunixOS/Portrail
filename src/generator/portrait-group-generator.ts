@@ -4,15 +4,14 @@ import {
 } from "@yunixos/paradoxical";
 
 import { PortraitGroup } from "../portrait-group";
-import { PortraitNode } from "../portrait-node";
-import { ConditionResolver } from "./condition-resolver";
+import { ConditionResolver, ResolvedNode } from "./condition-resolver";
 
 export class PortraitGroupGenerator {
     static generate(group: PortraitGroup, outputPath: string): ModFile[] {
-        const resolvedNodes = ConditionResolver.resolve(group.children);
+        const resolvedNodes = ConditionResolver.resolve(group);
         
         const files: ModFile[] = [];
-        for (const node of group.children) {
+        for (const node of resolvedNodes) {
             files.push(
                 ...this.generatePortraitNode(
                     group.name,
@@ -27,47 +26,30 @@ export class PortraitGroupGenerator {
 
     private static generatePortraitNode(
         groupName: string,
-        node: PortraitNode,
+        resolvedNode: ResolvedNode,
         outputPath: string,
-        nodePath: string[] = []
     ): ModFile[] {
-        if(nodePath[0] !== groupName) {
-            nodePath.unshift(groupName);
-        } 
-        
-        const currentPath = [...nodePath, node.name];
-        const id = currentPath.join("_");
-        if (!node.portraits) {
+        const id = resolvedNode.path.join("_");
+        if (!resolvedNode.node.portraits) {
             throw new Error(
                 `Cannot generate portrait node "${id}" because it has no portraits or subnodes with portraits. This node currently serves no purpose`
             );
         }
         
-        const files: ModFile[] = [];    
-        
-        for (const child of node.children) {
-            files.push( 
-                ...this.generatePortraitNode(
-                    groupName,
-                    child, 
-                    outputPath,
-                    currentPath
-                )
-            )
-        }
+        const files: ModFile[] = [];
                 
-        if(node.portraits.portraits.length < 1) {
+        if(resolvedNode.node.portraits.portraits.length < 1) {
             console.warn(`Portrait node "${id}" has no portraits: skipping generation`);
             return files;
         }
         
         const file = new ModFile(
             outputPath,
-            `${currentPath.join("_")}.txt`
+            `${id}.txt`
         );
 
         const portraitImports = file.addContainer("portraits");          
-        for (const [i, portrait] of node.portraits.portraits.entries()) {
+        for (const [i, portrait] of resolvedNode.node.portraits.portraits.entries()) {
             const portraitImport = portraitImports.addContainer(`${id}_${i}`);
             portraitImport.addClause("texturefile", portrait);
         }
@@ -78,21 +60,31 @@ export class PortraitGroupGenerator {
 
         group.addClause("default", keyword(`${id}_0`));
 
-        for (const scopeEntity of node.scopes) {
+        for (const scopeEntity of resolvedNode.node.scopes) {
             const scope = group.addContainer(scopeEntity.scope);
             const add = scope.addContainer("add");
             
-            if(node.conditions.length > 0) {
+            if(
+                resolvedNode.positiveConditions.length > 0
+                || resolvedNode.negativeConditions.length > 0
+            ) {
                 const trigger = add.addContainer("trigger");
-                for (const condition of node.conditions) {
+                for (const condition of resolvedNode.positiveConditions) {
                     trigger.add(condition);
                 }
+                
+                if (resolvedNode.negativeConditions.length > 0) {
+                    const nor = trigger.addContainer("NOR");
+                    for (const condition of resolvedNode.negativeConditions) {
+                        nor.add(condition);
+                    }
+                } 
             }
             
             const portraits = add.addContainer("portraits");
 
-            for (const portrait in node.portraits.portraits) {
-                portraits.addUnit(`${id}_${portrait}`);
+            for (const [i] of resolvedNode.node.portraits.portraits.entries()) {
+                portraits.addUnit(`${id}_${i}`);
             }
         }
         
