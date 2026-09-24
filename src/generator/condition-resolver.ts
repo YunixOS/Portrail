@@ -12,9 +12,9 @@ export interface ResolvedNode {
 export class ConditionResolver {
     static resolve(portraitGroup: PortraitGroup): ResolvedNode[] {
         const flattenedNodes = this.flattenNodeTree(
-            portraitGroup.children,
+            [portraitGroup.defaultNode],
             [],
-            [portraitGroup.name]
+            []
         );
         
         return this.resolveNegativeConditions(flattenedNodes);

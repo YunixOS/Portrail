@@ -1,16 +1,55 @@
 import { PortraitGroup } from "../portrait-group";
+import { PortraitNode } from "../portrait-node";
 import { ConditionResolver } from "./condition-resolver";
+
+function createGroup(
+    ...nodes: PortraitNode[]
+): PortraitGroup {
+    const group = new PortraitGroup("./mod", "group");
+    group.defaultNode.children.push(...nodes);
+    return group;
+}
+
+function createNode(
+    name: string,
+    ...traits: string[]
+): PortraitNode {
+    const node = new PortraitNode(name);
+
+    for (const trait of traits) {
+        node.addConditionClause(
+            "has_trait",
+            `trait_${trait}`
+        );
+    }
+
+    return node;
+}
+
+function addChild(
+    parent: PortraitNode,
+    child: PortraitNode
+): PortraitNode {
+    parent.children.push(child);
+    return child;
+}
 
 describe("ConditionResolver", () => {
     test("adds more specific conditions as negative conditions", () => {
-        const pg = new PortraitGroup("./mod", "pg");
-        const scientist = pg.addNode("scientist");
-        scientist.addConditionClause("has_trait", "trait_scientist");
+        const scientist = createNode(
+            "scientist",
+            "scientist"
+        );
 
-        const genius = scientist.addNode("genius");
-        genius.addConditionClause("has_trait", "trait_genius");
+        addChild(
+            scientist,
+            createNode("genius", "genius")
+        );
 
-        const resolved = ConditionResolver.resolve(pg);
+        const group = createGroup();
+        group.defaultNode = scientist;
+
+        const resolved = ConditionResolver.resolve(group);
 
         expect(resolved).toHaveLength(2);
 
@@ -33,19 +72,31 @@ describe("ConditionResolver", () => {
             })
         );
     });
-    
+
     test("does not exclude nodes with identical condition sets", () => {
-        const pg = new PortraitGroup("./mod", "pg");
-        const scientist = pg.addNode("scientist");
-        scientist.addConditionClause("has_trait", "trait_scientist");
+        const scientist = createNode(
+            "scientist",
+            "scientist"
+        );
 
-        const careless = scientist.addNode("carefree");
-        careless.addConditionClause("has_trait", "trait_carefree");
+        const careless = createNode(
+            "carefree",
+            "carefree"
+        );
 
-        const lazy = scientist.addNode("lazy");
-        lazy.addConditionClause("has_trait", "trait_carefree");
+        const lazy = createNode(
+            "lazy",
+            "carefree"
+        );
 
-        const resolved = ConditionResolver.resolve(pg);
+        scientist.children.push(
+            careless,
+            lazy
+        );
+
+        const group = createGroup(scientist);
+
+        const resolved = ConditionResolver.resolve(group);
 
         const resolvedCareless = resolved.find(
             node => node.node === careless
@@ -55,85 +106,159 @@ describe("ConditionResolver", () => {
             node => node.node === lazy
         );
 
-        expect(resolvedCareless!.negativeConditions).toHaveLength(0);
-        expect(resolvedLazy!.negativeConditions).toHaveLength(0);
+        expect(
+            resolvedCareless!.negativeConditions
+        ).toHaveLength(0);
+
+        expect(
+            resolvedLazy!.negativeConditions
+        ).toHaveLength(0);
     });
-    
+
     test("does not exclude incomparable condition sets", () => {
-        const pg = new PortraitGroup("./mod", "pg");
-        const scientist = pg.addNode("scientist");
-        scientist.addConditionClause("has_trait", "trait_scientist");
+        const scientist = createNode(
+            "scientist",
+            "scientist"
+        );
 
-        const a = scientist.addNode("a");
-        a.addConditionClause("has_trait", "trait_genius");
-        a.addConditionClause("has_trait", "trait_awesome");
+        const a = createNode(
+            "a",
+            "genius",
+            "awesome"
+        );
 
-        const b = scientist.addNode("b");
-        b.addConditionClause("has_trait", "trait_genius");
-        b.addConditionClause("has_trait", "trait_aggressive");
-        b.addConditionClause("has_trait", "trait_carefree");
+        const b = createNode(
+            "b",
+            "genius",
+            "aggressive",
+            "carefree"
+        );
 
-        const resolved = ConditionResolver.resolve(pg);
+        scientist.children.push(a, b);
 
-        const resolvedA = resolved.find(node => node.node === a);
-        const resolvedB = resolved.find(node => node.node === b);
+        const group = createGroup(scientist);
 
-        expect(resolvedA!.negativeConditions).toHaveLength(0);
-        expect(resolvedB!.negativeConditions).toHaveLength(0);
+        const resolved = ConditionResolver.resolve(group);
+
+        const resolvedA = resolved.find(
+            node => node.node === a
+        );
+
+        const resolvedB = resolved.find(
+            node => node.node === b
+        );
+
+        expect(
+            resolvedA!.negativeConditions
+        ).toHaveLength(0);
+
+        expect(
+            resolvedB!.negativeConditions
+        ).toHaveLength(0);
     });
-    
+
     test("only excludes additional conditions of a more specific node", () => {
-        const pg = new PortraitGroup("./mod", "pg");
-        const scientist = pg.addNode("scientist");
-        scientist.addConditionClause("has_trait", "trait_scientist");
+        const scientist = createNode(
+            "scientist",
+            "scientist"
+        );
 
-        const a = scientist.addNode("a");
-        a.addConditionClause("has_trait", "trait_genius");
-        a.addConditionClause("has_trait", "trait_cool");
+        const a = createNode(
+            "a",
+            "genius",
+            "cool"
+        );
 
-        const b = scientist.addNode("b");
-        b.addConditionClause("has_trait", "trait_genius");
-        b.addConditionClause("has_trait", "trait_aggressive");
-        b.addConditionClause("has_trait", "trait_carefree");
+        const b = createNode(
+            "b",
+            "genius",
+            "aggressive",
+            "carefree"
+        );
 
-        const c = scientist.addNode("c");
-        c.addConditionClause("has_trait", "trait_genius");
-        c.addConditionClause("has_trait", "trait_aggressive");
+        const c = createNode(
+            "c",
+            "genius",
+            "aggressive"
+        );
 
-        const resolved = ConditionResolver.resolve(pg);
+        scientist.children.push(a, b, c);
 
-        const resolvedScientist = resolved.find(node => node.node === scientist);
-        const resolvedA = resolved.find(node => node.node === a);
-        const resolvedB = resolved.find(node => node.node === b);
-        const resolvedC = resolved.find(node => node.node === c);
+        const group = createGroup(scientist);
 
-        expect(resolvedScientist!.negativeConditions).toHaveLength(3);
-        expect(resolvedA!.negativeConditions).toHaveLength(0);
-        expect(resolvedB!.negativeConditions).toHaveLength(0);
+        const resolved = ConditionResolver.resolve(group);
 
-        expect(resolvedC!.negativeConditions).toHaveLength(1);
-        expect(resolvedC!.negativeConditions[0]).toEqual(
+        const resolvedScientist = resolved.find(
+            node => node.node === scientist
+        );
+
+        const resolvedA = resolved.find(
+            node => node.node === a
+        );
+
+        const resolvedB = resolved.find(
+            node => node.node === b
+        );
+
+        const resolvedC = resolved.find(
+            node => node.node === c
+        );
+
+        expect(
+            resolvedScientist!.negativeConditions
+        ).toHaveLength(3);
+
+        expect(
+            resolvedA!.negativeConditions
+        ).toHaveLength(0);
+
+        expect(
+            resolvedB!.negativeConditions
+        ).toHaveLength(0);
+
+        expect(
+            resolvedC!.negativeConditions
+        ).toHaveLength(1);
+
+        expect(
+            resolvedC!.negativeConditions[0]
+        ).toEqual(
             expect.objectContaining({
                 name: "has_trait",
                 value: "trait_carefree"
             })
         );
     });
-    
-    test("groups negative conditions for the same node", () => {
-        const pg = new PortraitGroup("./mod", "pg");
-        const scientist = pg.addNode("scientist");
-        scientist.addConditionClause("has_trait", "trait_scientist");
 
-        const a = scientist.addNode("a");
-        a.addConditionClause("has_trait", "trait_genius");
-        a.addConditionClause("has_trait", "trait_cool");
-        
-        const resolved = ConditionResolver.resolve(pg);
-        const resolvedScientist = resolved.find(node => node.node === scientist);
-        
-        expect(resolvedScientist!.negativeConditions).toHaveLength(1);
-        expect(resolvedScientist!.negativeConditions[0]).toEqual(
+    test("groups negative conditions for the same node", () => {
+        const scientist = createNode(
+            "scientist",
+            "scientist"
+        );
+
+        scientist.children.push(
+            createNode(
+                "a",
+                "genius",
+                "cool"
+            )
+        );
+
+        const group = createGroup(scientist);
+
+        const resolved = ConditionResolver.resolve(group);
+
+        const resolvedScientist = resolved.find(
+            node => node.node === scientist
+        );
+
+        expect(
+            resolvedScientist!.negativeConditions
+        ).toHaveLength(1);
+
+        expect(
+            resolvedScientist!.negativeConditions[0]
+        ).toEqual(
             expect.objectContaining({
                 name: "AND"
             })

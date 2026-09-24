@@ -1,6 +1,6 @@
 import { PortraitDirectory } from "./filesystem/portrait-directory";
 import { PortraitNode } from "./portrait-node";
-import { Clause, Container } from "@yunixos/paradoxical";
+import { Clause, Container, Unit } from "@yunixos/paradoxical";
 
 describe("PortraitNode", () => {
     it("Adds child node", () => {
@@ -28,16 +28,16 @@ describe("PortraitNode", () => {
         
         it("Adds clause conditions", () => {
             const node = new PortraitNode("yui");
-            const clause = node.addConditionClause("age", 14);
+            node.addConditionClause("age", 14);
             
-            expect(node.conditions[0]).toBe(clause);
+            expect(node.conditions[0]).toBeInstanceOf(Clause);
         });
         
         it("Adds unit conditions", () => {
             const node = new PortraitNode("yui");
-            const unit = node.addConditionUnit("unit");
+            node.addConditionUnit("unit");
             
-            expect(node.conditions[0]).toBe(unit);
+            expect(node.conditions[0]).toBeInstanceOf(Unit);
         });
     }); 
 
@@ -62,11 +62,31 @@ describe("PortraitNode", () => {
         const node = new PortraitNode("yui");
         const portraits = new PortraitDirectory(
             "default", 
+            "path",
             ["gfx/models/portraits/default/1.dds"]
         )
         
         node.usePortraits(portraits);
         
         expect(node.portraits).toBe(portraits);
+    });
+    
+    it("supports method chaining", () => {
+        const node = new PortraitNode("yui")
+            .addConditionClause("hair", "black")
+            .addConditionClause("age", 14);
+
+        expect(node.conditions).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    name: "hair",
+                    value: "black"
+                }),
+                expect.objectContaining({
+                    name: "age",
+                    value: 14
+                })
+            ])
+        );
     });
 });

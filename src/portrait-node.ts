@@ -13,7 +13,7 @@ export class PortraitNode {
             this.addScope("game_setup");
             this.addScope("species");
             this.addScope("pop");
-            this.addScope("leader"); 
+            this.addScope("leader");
             this.addScope("ruler");
         }
     }
@@ -27,43 +27,61 @@ export class PortraitNode {
         return node;
     }
 
-    addCondition(condition: Node): void {
-        if (this.conditions.includes(condition)) {
-            return;
-        }
-
+    addCondition(condition: Node): PortraitNode {
         this.conditions.push(condition);
+        return this;
     }
     
-    addConditionContainer(name: string): Container | void {
-        const container = new Container(name);
-        if (this.conditions.includes(container)) {
-            return;
+    addConditionContainer(name: string): Container {
+        const existing = this.conditions.find(
+            condition =>
+                condition instanceof Container &&
+                condition.name === name
+        );
+
+        if (existing instanceof Container) {
+            return existing;
         }
 
+        const container = new Container(name);
         this.conditions.push(container);
+
         return container;
     }
     
-    addConditionClause(key: string, value: Value): Clause | void {
-        const clause = new Clause(key, value);
-        if (this.conditions.includes(clause)) {
-            return;
-        }
+    addConditionClause(key: string, value: Value): PortraitNode {
+        const existing = this.conditions.find(
+            condition =>
+                condition instanceof Clause &&
+                condition.name === key &&
+                condition.value === value
+        );
 
+        if (existing) {
+            return this;
+        }
+        
+        const clause = new Clause(key, value);
         this.conditions.push(clause);
-        return clause;
+
+        return this;
     }
     
-    addConditionUnit(value: Value): Unit | void {
-        const unit = new Unit(value);
-        if (!this.conditions.includes(unit)) {
-            return;
-        }
+    addConditionUnit(value: Value): PortraitNode {
+        const existing = this.conditions.find(
+            condition =>
+                condition instanceof Unit &&
+                condition.value === value
+        );
 
+        if (existing) {
+            return this;
+        }
+        
+        const unit = new Unit(value);
         this.conditions.push(unit);
         
-        return unit;
+        return this;
     }
 
     addScope(scope: Scope, inherit: boolean = true) {

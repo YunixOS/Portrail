@@ -29,7 +29,14 @@ export class PortraitGroupGenerator {
         resolvedNode: ResolvedNode,
         outputPath: string,
     ): ModFile[] {
-        const id = resolvedNode.path.join("_");
+        const isRootNode =
+            resolvedNode.path.length === 1 &&
+            resolvedNode.path[0] === groupName;
+
+        const id = isRootNode
+            ? groupName
+            : `${groupName}_${resolvedNode.path.join("_")}`;
+        
         if (!resolvedNode.node.portraits) {
             throw new Error(
                 `Cannot generate portrait node "${id}" because it has no portraits or subnodes with portraits. This node currently serves no purpose`
@@ -57,8 +64,10 @@ export class PortraitGroupGenerator {
         const portraitGroups = file.addContainer("portrait_groups");
 
         const group = portraitGroups.addContainer(groupName);
-
-        group.addClause("default", keyword(`${id}_0`));
+        
+        if (isRootNode) {
+            group.addClause("default", keyword(`${id}_0`));
+        }
 
         for (const scopeEntity of resolvedNode.node.scopes) {
             const scope = group.addContainer(scopeEntity.scope);

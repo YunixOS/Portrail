@@ -1,6 +1,7 @@
 import { PortraitGroup } from "../portrait-group";
 import { PortraitGroupGenerator } from "./portrait-group-generator";
 import { PortraitDirectory } from "../filesystem/portrait-directory";
+import { PortraitNode } from "../portrait-node";
 
 describe("PortraitGroupGenerator", () => {
     it("generates a file for a portrait node", () => {
@@ -9,20 +10,18 @@ describe("PortraitGroupGenerator", () => {
             "default"
         );
 
-        const node = group.addNode("cyborg");
-
-        node.usePortraits(
+        group.defaultNode.usePortraits(
             new PortraitDirectory(
-                "cyborg",
-                "./mod/gfx/models/portraits/default/cyborg",
+                "default",
+                "./mod/gfx/models/portraits/default",
                 [
-                    "gfx/models/portraits/default/cyborg/1.dds",
-                    "gfx/models/portraits/default/cyborg/2.dds"
+                    "gfx/models/portraits/default/1.dds",
+                    "gfx/models/portraits/default/2.dds"
                 ]
             )
         );
 
-        node.addScope("game_setup");
+        group.defaultNode.addScope("game_setup");
 
         const files = PortraitGroupGenerator.generate(
             group,
@@ -31,14 +30,16 @@ describe("PortraitGroupGenerator", () => {
 
         expect(files).toHaveLength(1);
     });
-    
+
     it("throws when a node has no portraits", () => {
         const group = new PortraitGroup(
             "./mod/gfx/models/portraits",
             "default"
         );
 
-        group.addNode("cyborg");
+        const node = new PortraitNode("cyborg");
+
+        group.defaultNode.children.push(node);
 
         expect(() => {
             PortraitGroupGenerator.generate(

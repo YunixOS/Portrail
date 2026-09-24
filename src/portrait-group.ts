@@ -9,9 +9,9 @@ import path from "node:path"
  * Represents a portrait group.
  */
 export class PortraitGroup {
-    children: PortraitNode[] = [];
+    defaultNode: PortraitNode;
     name: string;
-    dir: string;
+    dir: string; 
     private portraitDirectory?: PortraitDirectory;
 
     /**
@@ -25,63 +25,67 @@ export class PortraitGroup {
         public readonly relativePath: string
     ) {
         this.name = this.relativePath.toLowerCase().replace(/ /g, "_");
+        
         this.dir = path.join(
             this.root,
             this.relativePath
         )
+        
+        this.defaultNode = new PortraitNode(this.name);
     }
 
-    /**
-     * Adds a new {@link PortraitNode} to the {@link PortraitGroup}
-     * @param name - The name of the node.
-     * @example
-     * ```ts
-     * const default = portraitGroup.addNode("default");
-     */
-    addNode(name: string): PortraitNode {
-        const node = new PortraitNode(name.toLowerCase().replace(/ /g,"_"));
-        this.children.push(node);
-        return node;
-    }
-
-    /**
-     * Sets the portrait directory of the group to the one containing its portraits.
-     * @example - Get all portraits for the group in /gfx/models/portraits/path
-     * ```ts
-     * const portraitGroup = new portraitGroup("path");
-     * portraitGroup.getPortraits();
-     */
-    getPortraits(): void {
+    constructNodes(): void {
         this.portraitDirectory = PortraitLoader.loadPortraits(
             this.root,
             this.dir
         );
+        
+        this.defaultNode = this.createNodeTree(this.portraitDirectory);
     }
+    
+    private createNodeTree(
+        directory: PortraitDirectory
+    ): PortraitNode {
+        const node = new PortraitNode(directory.name);
 
-    /**
-     * Automatically handles attachment of group portraits to a {@link PortraitNode}
-     * by pairing each node with a ${@link PortraitDirectory} with a matching path.
-     */
-    attachPortraits(): void {
-        if (!this.portraitDirectory) {
-            throw new Error(
-                "Portraits must be loaded before attaching them."
+        node.usePortraits(directory);
+
+        for (const childDirectory of directory.children) {
+            node.children.push(
+                this.createNodeTree(childDirectory)
             );
         }
 
-        for (const node of this.children) {
-            const directory = this.portraitDirectory.children.find(
-                dir => dir.name === node.name
+        return node;
+    }
+    
+    node(nodePath: string): PortraitNode {
+        const parts = nodePath
+            .split("/")
+            .filter(part => part.length > 0);
+
+        if (parts.length === 0) {
+            throw new Error("Portrait node path cannot be empty.");
+        }
+
+        let children = this.defaultNode.children;
+        let currentNode: PortraitNode | undefined;
+
+        for (const part of parts) {
+            currentNode = children.find(
+                node => node.name === part
             );
 
-            if (!directory) {
+            if (!currentNode) {
                 throw new Error(
-                    `No portrait directory found for node "${node.name}".`
+                    `No portrait node found at "${nodePath}".`
                 );
             }
 
-            this.attachNode(node, directory);
+            children = currentNode.children;
         }
+
+        return currentNode!;
     }
     
     getModFiles(modPath: string): ModFile[] {
@@ -103,27 +107,6 @@ export class PortraitGroup {
         
         for (const file of modFiles) {
             file.write()
-        }
-    }
-
-    private attachNode(
-        node: PortraitNode,
-        directory: PortraitDirectory
-    ): void {
-        node.usePortraits(directory);
-
-        for (const child of node.children) {
-            const childDirectory = directory.children.find(
-                directory => directory.name === child.name
-            );
-
-            if (!childDirectory) {
-                throw new Error(
-                    `No portrait directory found for node "${child.name}".`
-                );
-            }
-
-            this.attachNode(child, childDirectory);
         }
     }
 }
