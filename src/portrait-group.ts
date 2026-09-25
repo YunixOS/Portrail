@@ -9,7 +9,6 @@ import path from "node:path"
  * Represents a portrait group.
  */
 export class PortraitGroup {
-    defaultNode: PortraitNode;
     name: string;
     dir: string; 
     private portraitDirectory?: PortraitDirectory;
@@ -22,7 +21,8 @@ export class PortraitGroup {
      */
     constructor(
         public readonly root: string,
-        public readonly relativePath: string
+        public readonly relativePath: string,
+        private _defaultNode?: PortraitNode
     ) {
         this.name = this.relativePath.toLowerCase().replace(/ /g, "_");
         
@@ -30,8 +30,17 @@ export class PortraitGroup {
             this.root,
             this.relativePath
         )
-        
-        this.defaultNode = new PortraitNode(this.name);
+    }
+    
+    get defaultNode(): PortraitNode {
+        if (!this._defaultNode) {
+            throw new Error(
+                "Portrait nodes have not been constructed. " +
+                "Call constructNodes() first."
+            );
+        }
+
+        return this._defaultNode;
     }
 
     constructNodes(): void {
@@ -40,7 +49,7 @@ export class PortraitGroup {
             this.dir
         );
         
-        this.defaultNode = this.createNodeTree(this.portraitDirectory);
+        this._defaultNode = this.createNodeTree(this.portraitDirectory);
     }
     
     private createNodeTree(

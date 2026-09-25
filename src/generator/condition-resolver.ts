@@ -1,4 +1,3 @@
-import { PortraitGroup } from "../portrait-group";
 import { PortraitNode } from "../portrait-node";
 import { Clause, Container, Keyword, Node } from "@yunixos/paradoxical";
 
@@ -10,9 +9,9 @@ export interface ResolvedNode {
 }
 
 export class ConditionResolver {
-    static resolve(portraitGroup: PortraitGroup): ResolvedNode[] {
+    static resolve(node: PortraitNode): ResolvedNode[] {
         const flattenedNodes = this.flattenNodeTree(
-            [portraitGroup.defaultNode],
+            [node],
             [],
             []
         );

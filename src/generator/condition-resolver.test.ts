@@ -1,14 +1,5 @@
-import { PortraitGroup } from "../portrait-group";
 import { PortraitNode } from "../portrait-node";
 import { ConditionResolver } from "./condition-resolver";
-
-function createGroup(
-    ...nodes: PortraitNode[]
-): PortraitGroup {
-    const group = new PortraitGroup("./mod", "group");
-    group.defaultNode.children.push(...nodes);
-    return group;
-}
 
 function createNode(
     name: string,
@@ -46,10 +37,7 @@ describe("ConditionResolver", () => {
             createNode("genius", "genius")
         );
 
-        const group = createGroup();
-        group.defaultNode = scientist;
-
-        const resolved = ConditionResolver.resolve(group);
+        const resolved = ConditionResolver.resolve(scientist);
 
         expect(resolved).toHaveLength(2);
 
@@ -94,9 +82,7 @@ describe("ConditionResolver", () => {
             lazy
         );
 
-        const group = createGroup(scientist);
-
-        const resolved = ConditionResolver.resolve(group);
+        const resolved = ConditionResolver.resolve(scientist);
 
         const resolvedCareless = resolved.find(
             node => node.node === careless
@@ -136,9 +122,7 @@ describe("ConditionResolver", () => {
 
         scientist.children.push(a, b);
 
-        const group = createGroup(scientist);
-
-        const resolved = ConditionResolver.resolve(group);
+        const resolved = ConditionResolver.resolve(scientist);
 
         const resolvedA = resolved.find(
             node => node.node === a
@@ -184,9 +168,7 @@ describe("ConditionResolver", () => {
 
         scientist.children.push(a, b, c);
 
-        const group = createGroup(scientist);
-
-        const resolved = ConditionResolver.resolve(group);
+        const resolved = ConditionResolver.resolve(scientist);
 
         const resolvedScientist = resolved.find(
             node => node.node === scientist
@@ -244,9 +226,7 @@ describe("ConditionResolver", () => {
             )
         );
 
-        const group = createGroup(scientist);
-
-        const resolved = ConditionResolver.resolve(group);
+        const resolved = ConditionResolver.resolve(scientist);
 
         const resolvedScientist = resolved.find(
             node => node.node === scientist

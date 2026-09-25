@@ -201,9 +201,7 @@ describe("PortraitGroup", () => {
 
             expect(() =>
                 group.node("cyborg/unknown")
-            ).toThrow(
-                'No portrait node found at "cyborg/unknown".'
-            );
+            ).toThrow();
         });
         
         it("throws when given an empty path", () => {

@@ -8,7 +8,7 @@ import { ConditionResolver, ResolvedNode } from "./condition-resolver";
 
 export class PortraitGroupGenerator {
     static generate(group: PortraitGroup, outputPath: string): ModFile[] {
-        const resolvedNodes = ConditionResolver.resolve(group);
+        const resolvedNodes = ConditionResolver.resolve(group.defaultNode);
         
         const files: ModFile[] = [];
         for (const node of resolvedNodes) {
@@ -33,9 +33,7 @@ export class PortraitGroupGenerator {
             resolvedNode.path.length === 1 &&
             resolvedNode.path[0] === groupName;
 
-        const id = isRootNode
-            ? groupName
-            : `${groupName}_${resolvedNode.path.join("_")}`;
+        const id = resolvedNode.path.join("_");
         
         if (!resolvedNode.node.portraits) {
             throw new Error(

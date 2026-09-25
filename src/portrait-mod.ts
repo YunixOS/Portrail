@@ -19,7 +19,11 @@ export class PortraitMod {
 
     addPortraitGroup(path: string): PortraitGroup {
         const portraitGroup = new PortraitGroup(this.portraitDir, path);
-        this.portraitGroups.push(portraitGroup);
+        
+        portraitGroup.constructNodes(); 
+        
+        this.portraitGroups.push(portraitGroup); 
+        
         return portraitGroup;
     }
     
