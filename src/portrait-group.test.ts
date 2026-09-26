@@ -88,6 +88,17 @@ describe("PortraitGroup", () => {
             force: true
         });
     });
+    
+    describe("init", () => {
+        it("replaces spaces in name with underscores", () => {
+            const group = new PortraitGroup(
+                root,
+                "default group"
+            )
+            
+            expect(group.name).toBe("default_group");
+        });
+    });
 
     describe("construction", () => {
         it("builds the node tree from the portrait directory", () => {

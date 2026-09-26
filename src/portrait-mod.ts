@@ -28,7 +28,6 @@ export class PortraitMod {
     }
     
     write(): void {
-        console.log(this.portraitGroups);
         this.portraitGroups.forEach((group) => {
             group.writeFiles(this.dir);
         });
