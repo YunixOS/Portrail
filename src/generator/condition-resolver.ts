@@ -8,136 +8,134 @@ export interface ResolvedNode {
     negativeConditions: Node[];
 }
 
-export class ConditionResolver {
-    static resolve(node: PortraitNode): ResolvedNode[] {
-        const flattenedNodes = this.flattenNodeTree(
-            [node],
-            [],
-            []
+export function resolve(node: PortraitNode): ResolvedNode[] {
+    const flattenedNodes = flattenNodeTree(
+        [node],
+        [],
+        []
+    );
+
+    return resolveNegativeConditions(flattenedNodes);
+}
+
+function flattenNodeTree(
+    nodeTree: PortraitNode[], 
+    inheritedConditions: Node[] = [],
+    nodePath: string[] = []
+): ResolvedNode[] {
+    const flattenedTree: ResolvedNode[] = []; 
+    for(const node of nodeTree) {
+        const currentPath = [...nodePath, node.name];
+
+        const conditions = [...inheritedConditions, ...node.conditions];
+        flattenedTree.push({
+            node: node,
+            path: currentPath,
+            positiveConditions: conditions,
+            negativeConditions: [],
+        });
+
+        flattenedTree.push(
+            ...flattenNodeTree(
+                node.children, 
+                conditions,
+                currentPath
+            )
         );
-        
-        return this.resolveNegativeConditions(flattenedNodes);
     }
 
-    private static flattenNodeTree(
-        nodeTree: PortraitNode[], 
-        inheritedConditions: Node[] = [],
-        nodePath: string[] = []
-    ): ResolvedNode[] {
-        const flattenedTree: ResolvedNode[] = []; 
-        for(const node of nodeTree) {
-            const currentPath = [...nodePath, node.name];
-            
-            const conditions = [...inheritedConditions, ...node.conditions];
-            flattenedTree.push({
-                node: node,
-                path: currentPath,
-                positiveConditions: conditions,
-                negativeConditions: [],
-            });
-            
-            flattenedTree.push(
-                ...this.flattenNodeTree(
-                    node.children, 
-                    conditions,
-                    currentPath
-                )
-            );
-        }
-        
-        return flattenedTree;
-    }
+    return flattenedTree;
+}
     
-    private static resolveNegativeConditions(
-        flattenedNodes: ResolvedNode[]
-    ): ResolvedNode[] {
-        for (const node of flattenedNodes) {
-            for (const otherNode of flattenedNodes) {
-                if (!this.isStrictSubset(
-                    otherNode.positiveConditions,
-                    node.positiveConditions
-                )) {
-                    continue;
-                }
+function resolveNegativeConditions(
+    flattenedNodes: ResolvedNode[]
+): ResolvedNode[] {
+    for (const node of flattenedNodes) {
+        for (const otherNode of flattenedNodes) {
+            if (!isStrictSubset(
+                otherNode.positiveConditions,
+                node.positiveConditions
+            )) {
+                continue;
+            }
 
-                const additionalConditions =
-                    node.positiveConditions.filter(
-                        condition =>
-                            !otherNode.positiveConditions.some(
-                                other =>
-                                    this.conditionsEqual(condition, other)
-                            )
-                    );
-
-                if (additionalConditions.length === 0) {
-                    continue;
-                }
-
-                let negativeCondition: Node;
-
-                if (additionalConditions.length === 1) {
-                    negativeCondition = additionalConditions[0];
-                } else {
-                    const container = new Container("AND");
-
-                    for (const condition of additionalConditions) {
-                        container.add(condition);
-                    }
-
-                    negativeCondition = container;
-                }
-
-                if (!otherNode.negativeConditions.some(
+            const additionalConditions =
+                node.positiveConditions.filter(
                     condition =>
-                        this.conditionsEqual(condition, negativeCondition)
-                )) {
-                    otherNode.negativeConditions.push(negativeCondition);
+                        !otherNode.positiveConditions.some(
+                            other =>
+                                conditionsEqual(condition, other)
+                        )
+                );
+
+            if (additionalConditions.length === 0) {
+                continue;
+            }
+
+            let negativeCondition: Node;
+
+            if (additionalConditions.length === 1) {
+                negativeCondition = additionalConditions[0];
+            } else {
+                const container = new Container("AND");
+
+                for (const condition of additionalConditions) {
+                    container.add(condition);
                 }
+
+                negativeCondition = container;
+            }
+
+            if (!otherNode.negativeConditions.some(
+                condition =>
+                    conditionsEqual(condition, negativeCondition)
+            )) {
+                otherNode.negativeConditions.push(negativeCondition);
             }
         }
+    }
 
         return flattenedNodes;
     }
     
-    private static conditionsEqual(a: Node, b: Node): boolean {
-        if (a instanceof Clause && b instanceof Clause) {
-            if (a.name !== b.name || a.operator !== b.operator) {
-                return false;
-            }
-
-            if (a.value instanceof Keyword && b.value instanceof Keyword) {
-                return a.value.value === b.value.value;
-            }
-            
-            return a.value === b.value;
+function conditionsEqual(a: Node, b: Node): boolean {
+    if (a instanceof Clause && b instanceof Clause) {
+        if (a.name !== b.name || a.operator !== b.operator) {
+            return false;
         }
 
-        if (a instanceof Container && b instanceof Container) {
-            return (
-                a.name === b.name &&
-                a.children.length === b.children.length &&
-                a.children.every(child =>
-                    b.children.some(other =>
-                        this.conditionsEqual(child, other)
-                    )
-                )
-            );
+        if (a.value instanceof Keyword && b.value instanceof Keyword) {
+            return a.value.value === b.value.value;
         }
 
-        return false;
-    } 
-    
-    private static isStrictSubset(
-        subset: Node[],
-        superset: Node[]
-    ): boolean {
+        return a.value === b.value;
+    }
+
+    if (a instanceof Container && b instanceof Container) {
         return (
-            subset.length < superset.length &&
-            subset.every(condition =>
-                superset.some(otherCondition =>
-                    this.conditionsEqual(condition, otherCondition)
+            a.name === b.name &&
+            a.children.length === b.children.length &&
+            a.children.every(child =>
+                b.children.some(other =>
+                    conditionsEqual(child, other)
                 )
             )
         );
     }
+
+    return false;
+} 
+    
+function isStrictSubset(
+    subset: Node[],
+    superset: Node[]
+): boolean {
+    return (
+        subset.length < superset.length &&
+        subset.every(condition =>
+            superset.some(otherCondition =>
+                conditionsEqual(condition, otherCondition)
+            )
+        )
+    );
 }

@@ -1,9 +1,9 @@
 import { PortraitGroup } from "../portrait-group";
-import { PortraitGroupGenerator } from "./portrait-group-generator";
+import { generate } from "./portrait-file-generator";
 import { PortraitDirectory } from "../filesystem/portrait-directory";
 import { PortraitNode } from "../portrait-node";
 
-describe("PortraitGroupGenerator", () => {
+describe("generate()", () => {
     it("generates a file for a portrait node", () => { 
         const node = new PortraitNode("cyborg");
         node.usePortraits(
@@ -25,7 +25,7 @@ describe("PortraitGroupGenerator", () => {
 
         group.defaultNode.addScope("game_setup");
 
-        const files = PortraitGroupGenerator.generate(
+        const files = generate(
             group,
             "./output"
         );
@@ -45,7 +45,7 @@ describe("PortraitGroupGenerator", () => {
         );
 
         expect(() => {
-            PortraitGroupGenerator.generate(
+            generate(
                 group,
                 "./output"
             );

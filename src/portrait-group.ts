@@ -1,7 +1,7 @@
 import { ModFile } from "@yunixos/paradoxical";
 import { PortraitDirectory } from "./filesystem/portrait-directory";
 import PortraitLoader from "./filesystem/portrait-loader";
-import { PortraitGroupGenerator } from "./generator/portrait-group-generator";
+import { generate } from "./generator/portrait-file-generator";
 import { PortraitNode } from "./portrait-node";
 import path from "node:path"
 
@@ -98,7 +98,7 @@ export class PortraitGroup {
     }
     
     getModFiles(modPath: string): ModFile[] {
-        const files = PortraitGroupGenerator.generate(
+        const files = generate(
             this, 
             path.join(
                 modPath,
