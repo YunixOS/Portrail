@@ -1,0 +1,123 @@
+portraits = {
+	pg_test_default_0 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/1.dds"
+	}
+	pg_test_default_1 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/2.dds"
+	}
+	pg_test_default_2 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/3.dds"
+	}
+	pg_test_default_3 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/4.dds"
+	}
+}
+
+portrait_groups = {
+	pg_test_default = {
+		default = pg_test_default_0
+		game_setup = {
+			add = {
+				trigger = {
+					NOR = {
+						species = {
+							has_trait = "trait_cool"
+						}
+					}
+				}
+				portraits = {
+					"pg_test_default_0"
+					"pg_test_default_1"
+					"pg_test_default_2"
+					"pg_test_default_3"
+				}
+			}
+		}
+		leader = {
+			add = {
+				trigger = {
+					NOR = {
+						species = {
+							has_trait = "trait_cool"
+						}
+						AND = {
+							species = {
+								has_trait = "trait_cool"
+							}
+							leader_class = "commander"
+						}
+						AND = {
+							species = {
+								has_trait = "trait_cool"
+							}
+							leader_class = "scientist"
+						}
+						leader_class = "official"
+					}
+				}
+				portraits = {
+					"pg_test_default_0"
+					"pg_test_default_1"
+					"pg_test_default_2"
+					"pg_test_default_3"
+				}
+			}
+		}
+		pop = {
+			add = {
+				trigger = {
+					NOR = {
+						species = {
+							has_trait = "trait_cool"
+						}
+					}
+				}
+				portraits = {
+					"pg_test_default_0"
+					"pg_test_default_1"
+					"pg_test_default_2"
+					"pg_test_default_3"
+				}
+			}
+		}
+		ruler = {
+			add = {
+				trigger = {
+					NOR = {
+						species = {
+							has_trait = "trait_cool"
+						}
+						AND = {
+							species = {
+								has_trait = "trait_cool"
+							}
+							leader_class = "commander"
+						}
+						leader_class = "official"
+					}
+				}
+				portraits = {
+					"pg_test_default_0"
+					"pg_test_default_1"
+					"pg_test_default_2"
+					"pg_test_default_3"
+				}
+			}
+		}
+		species = {
+			add = {
+				trigger = {
+					NOR = {
+						has_trait = "trait_cool"
+					}
+				}
+				portraits = {
+					"pg_test_default_0"
+					"pg_test_default_1"
+					"pg_test_default_2"
+					"pg_test_default_3"
+				}
+			}
+		}
+	}
+}

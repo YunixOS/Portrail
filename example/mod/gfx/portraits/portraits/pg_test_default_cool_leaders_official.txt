@@ -1,0 +1,20 @@
+portraits = {
+	pg_test_default_cool_leaders_official_0 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/leaders/official/1.dds"
+	}
+	pg_test_default_cool_leaders_official_1 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/leaders/official/2.dds"
+	}
+	pg_test_default_cool_leaders_official_2 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/leaders/official/3.dds"
+	}
+	pg_test_default_cool_leaders_official_3 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/leaders/official/4.dds"
+	}
+}
+
+portrait_groups = {
+	pg_test_default = {
+
+	}
+}

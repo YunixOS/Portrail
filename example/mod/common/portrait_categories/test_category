@@ -1,0 +1,6 @@
+test_category = {
+	name = "My Mod Category"
+	sets = {
+		test_set
+	}
+}

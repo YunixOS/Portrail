@@ -1,0 +1,13 @@
+{
+  "name": "dummy-mod",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "portrail": "file:portrail-1.0.0.tgz"
+  }
+}
