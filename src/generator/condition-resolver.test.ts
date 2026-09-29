@@ -1,4 +1,6 @@
+import { Clause } from "@yunixos/paradoxical";
 import { PortraitNode } from "../portrait-node";
+import { ScopeEntity } from "../scope-entity";
 import { resolve } from "./condition-resolver";
 
 function createNode(
@@ -7,11 +9,17 @@ function createNode(
 ): PortraitNode {
     const node = new PortraitNode(name);
 
-    for (const trait of traits) {
-        node.addConditionClause(
-            "has_trait",
-            `trait_${trait}`
-        );
+    if (traits.length > 0) {
+        const scope = node.addScope("leader");
+
+        for (const trait of traits) {
+            scope.addCondition(
+                new Clause(
+                    "has_trait",
+                    `trait_${trait}`
+                )
+            );
+        }
     }
 
     return node;
@@ -23,6 +31,19 @@ function addChild(
 ): PortraitNode {
     parent.children.push(child);
     return child;
+}
+
+function getScope(
+    node: ReturnType<typeof resolve>[number],
+    scope: string
+) {
+    const resolvedScope = node.scopes.find(
+        entity => entity.scope === scope
+    );
+
+    expect(resolvedScope).toBeDefined();
+
+    return resolvedScope!;
 }
 
 describe("ConditionResolver", () => {
@@ -47,12 +68,17 @@ describe("ConditionResolver", () => {
 
         expect(resolvedScientist).toBeDefined();
 
+        const leaderScope = getScope(
+            resolvedScientist!,
+            "leader"
+        );
+
         expect(
-            resolvedScientist!.negativeConditions
+            leaderScope.negativeConditions
         ).toHaveLength(1);
 
         expect(
-            resolvedScientist!.negativeConditions[0]
+            leaderScope.negativeConditions[0]
         ).toEqual(
             expect.objectContaining({
                 name: "has_trait",
@@ -67,7 +93,7 @@ describe("ConditionResolver", () => {
             "scientist"
         );
 
-        const careless = createNode(
+        const carefree = createNode(
             "carefree",
             "carefree"
         );
@@ -78,14 +104,14 @@ describe("ConditionResolver", () => {
         );
 
         scientist.children.push(
-            careless,
+            carefree,
             lazy
         );
 
         const resolved = resolve(scientist);
 
         const resolvedCareless = resolved.find(
-            node => node.node === careless
+            node => node.node === carefree
         );
 
         const resolvedLazy = resolved.find(
@@ -93,11 +119,13 @@ describe("ConditionResolver", () => {
         );
 
         expect(
-            resolvedCareless!.negativeConditions
+            getScope(resolvedCareless!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
 
         expect(
-            resolvedLazy!.negativeConditions
+            getScope(resolvedLazy!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
     });
 
@@ -133,11 +161,13 @@ describe("ConditionResolver", () => {
         );
 
         expect(
-            resolvedA!.negativeConditions
+            getScope(resolvedA!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
 
         expect(
-            resolvedB!.negativeConditions
+            getScope(resolvedB!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
     });
 
@@ -187,23 +217,28 @@ describe("ConditionResolver", () => {
         );
 
         expect(
-            resolvedScientist!.negativeConditions
+            getScope(resolvedScientist!, "leader")
+                .negativeConditions
         ).toHaveLength(3);
 
         expect(
-            resolvedA!.negativeConditions
+            getScope(resolvedA!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
 
         expect(
-            resolvedB!.negativeConditions
+            getScope(resolvedB!, "leader")
+                .negativeConditions
         ).toHaveLength(0);
 
         expect(
-            resolvedC!.negativeConditions
+            getScope(resolvedC!, "leader")
+                .negativeConditions
         ).toHaveLength(1);
 
         expect(
-            resolvedC!.negativeConditions[0]
+            getScope(resolvedC!, "leader")
+                .negativeConditions[0]
         ).toEqual(
             expect.objectContaining({
                 name: "has_trait",
@@ -232,12 +267,17 @@ describe("ConditionResolver", () => {
             node => node.node === scientist
         );
 
+        const leaderScope = getScope(
+            resolvedScientist!,
+            "leader"
+        );
+
         expect(
-            resolvedScientist!.negativeConditions
+            leaderScope.negativeConditions
         ).toHaveLength(1);
 
         expect(
-            resolvedScientist!.negativeConditions[0]
+            leaderScope.negativeConditions[0]
         ).toEqual(
             expect.objectContaining({
                 name: "AND"

@@ -1,7 +1,7 @@
 import { ModFile } from "@yunixos/paradoxical";
 import { PortraitDirectory } from "./filesystem/portrait-directory";
 import PortraitLoader from "./filesystem/portrait-loader";
-import { generate } from "./generator/portrait-file-generator";
+import { generate } from "./generator/node-file-generator";
 import { PortraitNode } from "./portrait-node";
 import path from "node:path"
 
@@ -33,7 +33,7 @@ export class PortraitGroup {
      * The name used to identify the portrait group in generated files.
      *
      * The name is derived from {@link relativePath} by taking the basename,
-     * converting it to lowercase and replacing spaces with underscores.
+     * converting it to lowercase and replacing special characters with underscores.
      */
     name: string;
 
@@ -210,9 +210,9 @@ export class PortraitGroup {
     }
     
     /**
-     * Generates and writes the mod files for this portrait group.
+     * Generates and writes the node mod files for this portrait group.
      *
-     * @param modPath - The root path of the mod to write files to.
+     * @param modPath - The root path of the mod.
      *
      * @example
      * ```ts
@@ -224,7 +224,8 @@ export class PortraitGroup {
         const modFiles = this.getModFiles(modPath);
         
         for (const file of modFiles) {
-            file.write()
+            file.write();
+            console.log("Completed write: " + file.name);
         }
     }
 }

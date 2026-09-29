@@ -1,12 +1,26 @@
 import { PortraitNode } from "../portrait-node";
 import { Clause, Container, Keyword, Node } from "@yunixos/paradoxical";
+import { Scope } from "../types";
+
+export interface ResolvedScope {
+    scope: Scope;
+    positiveConditions: Node[];
+    negativeConditions: Node[];
+}
 
 export interface ResolvedNode {
     node: PortraitNode;
     path: string[];
-    positiveConditions: Node[];
-    negativeConditions: Node[];
+    scopes: ResolvedScope[];
 }
+
+const DEFAULT_SCOPES = [
+    "game_setup",
+    "leader",
+    "pop",
+    "ruler",
+    "species"
+] as const;
 
 export function resolve(node: PortraitNode): ResolvedNode[] {
     const flattenedNodes = flattenNodeTree(
@@ -19,26 +33,32 @@ export function resolve(node: PortraitNode): ResolvedNode[] {
 }
 
 function flattenNodeTree(
-    nodeTree: PortraitNode[], 
-    inheritedConditions: Node[] = [],
+    nodeTree: PortraitNode[],
+    inheritedScopes: ResolvedScope[] = [],
     nodePath: string[] = []
 ): ResolvedNode[] {
-    const flattenedTree: ResolvedNode[] = []; 
-    for(const node of nodeTree) {
+    const flattenedTree: ResolvedNode[] = [];
+
+    for (const node of nodeTree) {
         const currentPath = [...nodePath, node.name];
 
-        const conditions = [...inheritedConditions, ...node.conditions];
-        flattenedTree.push({
-            node: node,
+        const scopes = resolveScopes(
+            node,
+            inheritedScopes
+        );
+
+        const resolvedNode: ResolvedNode = {
+            node,
             path: currentPath,
-            positiveConditions: conditions,
-            negativeConditions: [],
-        });
+            scopes
+        };
+
+        flattenedTree.push(resolvedNode);
 
         flattenedTree.push(
             ...flattenNodeTree(
-                node.children, 
-                conditions,
+                node.children,
+                scopes,
                 currentPath
             )
         );
@@ -46,58 +66,122 @@ function flattenNodeTree(
 
     return flattenedTree;
 }
-    
+
+function resolveScopes(
+    node: PortraitNode,
+    inheritedScopes: ResolvedScope[]
+): ResolvedScope[] {
+    if (
+        node.scopes.length === 0 &&
+        inheritedScopes.length === 0
+    ) {
+        return DEFAULT_SCOPES.map(scope => ({
+            scope,
+            positiveConditions: [],
+            negativeConditions: []
+        }));
+    }
+
+    const scopes = inheritedScopes.map(scope => ({
+        scope: scope.scope,
+        positiveConditions: [...scope.positiveConditions],
+        negativeConditions: []
+    }));
+
+    for (const scopeEntity of node.scopes) {
+        const existing = scopes.find(
+            scope => scope.scope === scopeEntity.scope
+        );
+
+        if (existing) {
+            existing.positiveConditions.push(
+                ...scopeEntity.conditions
+            );
+        } else {
+            scopes.push({
+                scope: scopeEntity.scope,
+                positiveConditions: [...scopeEntity.conditions],
+                negativeConditions: []
+            });
+        }
+    }
+
+    return scopes;
+}   
+
 function resolveNegativeConditions(
     flattenedNodes: ResolvedNode[]
 ): ResolvedNode[] {
     for (const node of flattenedNodes) {
         for (const otherNode of flattenedNodes) {
-            if (!isStrictSubset(
-                otherNode.positiveConditions,
-                node.positiveConditions
-            )) {
-                continue;
-            }
-
-            const additionalConditions =
-                node.positiveConditions.filter(
-                    condition =>
-                        !otherNode.positiveConditions.some(
-                            other =>
-                                conditionsEqual(condition, other)
-                        )
+            for (const nodeScope of node.scopes) {
+                const otherScope = otherNode.scopes.find(
+                    scope => scope.scope === nodeScope.scope
                 );
 
-            if (additionalConditions.length === 0) {
-                continue;
-            }
-
-            let negativeCondition: Node;
-
-            if (additionalConditions.length === 1) {
-                negativeCondition = additionalConditions[0];
-            } else {
-                const container = new Container("AND");
-
-                for (const condition of additionalConditions) {
-                    container.add(condition);
+                if (!otherScope) {
+                    continue;
                 }
 
-                negativeCondition = container;
-            }
-
-            if (!otherNode.negativeConditions.some(
-                condition =>
-                    conditionsEqual(condition, negativeCondition)
-            )) {
-                otherNode.negativeConditions.push(negativeCondition);
+                resolveScopeNegativeConditions(
+                    nodeScope,
+                    otherScope
+                );
             }
         }
     }
 
-        return flattenedNodes;
+    return flattenedNodes;
+}
+
+function resolveScopeNegativeConditions(
+    nodeScope: ResolvedScope,
+    otherScope: ResolvedScope
+): void {
+    if (!isStrictSubset(
+        otherScope.positiveConditions,
+        nodeScope.positiveConditions
+    )) {
+        return;
     }
-    
+
+    const additionalConditions =
+        nodeScope.positiveConditions.filter(
+            condition =>
+                !otherScope.positiveConditions.some(
+                    other =>
+                        conditionsEqual(condition, other)
+                )
+        );
+
+    if (additionalConditions.length === 0) {
+        return;
+    }
+
+    let negativeCondition: Node;
+
+    if (additionalConditions.length === 1) {
+        negativeCondition = additionalConditions[0];
+    } else {
+        const container = new Container("AND");
+
+        for (const condition of additionalConditions) {
+            container.add(condition);
+        }
+
+        negativeCondition = container;
+    }
+
+    if (!otherScope.negativeConditions.some(
+        condition =>
+            conditionsEqual(condition, negativeCondition)
+    )) {
+        otherScope.negativeConditions.push(
+            negativeCondition
+        );
+    }
+}
+
 function conditionsEqual(a: Node, b: Node): boolean {
     if (a instanceof Clause && b instanceof Clause) {
         if (a.name !== b.name || a.operator !== b.operator) {

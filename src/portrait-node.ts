@@ -8,15 +8,7 @@ export class PortraitNode {
         public readonly name: string,
         public scopes: ScopeEntity[] = [],
         public portraits?: PortraitDirectory
-    ){
-        if (this.scopes.length < 1) {
-            this.addScope("game_setup");
-            this.addScope("species");
-            this.addScope("pop");
-            this.addScope("leader");
-            this.addScope("ruler");
-        }
-    }
+    ){}
 
     children: PortraitNode[] = [];
     conditions: Node[] = [];
@@ -84,13 +76,29 @@ export class PortraitNode {
         return this;
     }
 
-    addScope(scope: Scope, inherit: boolean = true) {
+    addScope(scope: Scope, inherit: boolean = true): ScopeEntity {
         const scopeEntity = new ScopeEntity(scope);
         if (inherit) {
             scopeEntity.addConditions(this.conditions);
         }
         this.scopes.push(scopeEntity);
         return scopeEntity;
+    }
+    
+    addScopes(scopes: Scope[], inherit: boolean = true): ScopeEntity[] {
+        const addedScopes: ScopeEntity[] = [];
+        scopes.forEach((scope) => {
+            const scopeEntity = new ScopeEntity(scope);
+            if (inherit) {
+                scopeEntity.addConditions(this.conditions);
+            }
+            
+            addedScopes.push(scopeEntity);
+        });
+        
+        this.scopes.push(...addedScopes);
+        
+        return addedScopes;
     }
 
     usePortraits(directory: PortraitDirectory): void {

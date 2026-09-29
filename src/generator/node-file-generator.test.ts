@@ -1,5 +1,5 @@
 import { PortraitGroup } from "../portrait-group";
-import { generate } from "./portrait-file-generator";
+import { generate } from "./node-file-generator";
 import { PortraitDirectory } from "../filesystem/portrait-directory";
 import { PortraitNode } from "../portrait-node";
 

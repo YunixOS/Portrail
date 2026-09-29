@@ -1,8 +1,12 @@
+import { PortraitCategory } from "./portrait-category";
 import { PortraitGroup } from "./portrait-group";
 import path from "node:path";
+import { PortraitSet } from "./portrait-set";
 
 export class PortraitMod {
     portraitDir: string
+    categoryDir: string
+    setDir: string
 
     constructor(
         public readonly dir: string
@@ -13,12 +17,44 @@ export class PortraitMod {
             "models",
             "portraits"
         )
+        
+        this.categoryDir = path.join(
+            this.dir,
+            "common",
+            "portrait_categories"
+        )
+        
+        this.setDir = path.join(
+            this.dir,
+            "common",
+            "portrait_sets"
+        )
+    }
+
+    portraitCategories: PortraitCategory[] = [];
+    
+    createPortraitCategory(id: string, name: string) {
+        const portraitCategory = new PortraitCategory(id, name);
+        
+        this.portraitCategories.push(portraitCategory);
+
+        return portraitCategory;
+    }
+    
+    portraitSets: PortraitSet[] = [];
+    
+    createPortraitSet(id: string, speciesClass: string) {
+        const portraitSet = new PortraitSet(id, speciesClass);
+        
+        this.portraitSets.push(portraitSet);
+        
+        return portraitSet;
     }
 
     portraitGroups: PortraitGroup[] = [];
-
-    addPortraitGroup(path: string): PortraitGroup {
-        const portraitGroup = new PortraitGroup(this.portraitDir, path);
+    
+    createPortraitGroup(relativePath: string): PortraitGroup {
+        const portraitGroup = new PortraitGroup(this.portraitDir, relativePath);
         
         portraitGroup.constructNodes(); 
         
@@ -28,6 +64,14 @@ export class PortraitMod {
     }
     
     write(): void {
+        this.portraitCategories.forEach((category) => {
+            category.writeFile(this.categoryDir);
+        });
+        
+        this.portraitSets.forEach((set) => {
+            set.writeFile(this.setDir);
+        });
+        
         this.portraitGroups.forEach((group) => {
             group.writeFiles(this.dir);
         });
