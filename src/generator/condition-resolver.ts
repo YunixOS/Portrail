@@ -1,5 +1,10 @@
 import { PortraitNode } from "../portrait-node";
-import { Clause, Container, Keyword, Node } from "@yunixos/paradoxical";
+import {
+    Clause,
+    Container,
+    Keyword,
+    Node
+} from "@yunixos/paradoxical";
 import { Scope } from "../types";
 
 export interface ResolvedScope {
@@ -14,18 +19,18 @@ export interface ResolvedNode {
     scopes: ResolvedScope[];
 }
 
-const DEFAULT_SCOPES = [
+const DEFAULT_SCOPES: Scope[] = [
     "game_setup",
     "leader",
     "pop",
     "ruler",
     "species"
-] as const;
+];
 
 export function resolve(node: PortraitNode): ResolvedNode[] {
     const flattenedNodes = flattenNodeTree(
         [node],
-        [],
+        new Map(),
         []
     );
 
@@ -34,17 +39,21 @@ export function resolve(node: PortraitNode): ResolvedNode[] {
 
 function flattenNodeTree(
     nodeTree: PortraitNode[],
-    inheritedScopes: ResolvedScope[] = [],
-    nodePath: string[] = []
+    inheritedConditions: Map<Scope, Node[]>,
+    nodePath: string[]
 ): ResolvedNode[] {
     const flattenedTree: ResolvedNode[] = [];
 
     for (const node of nodeTree) {
-        const currentPath = [...nodePath, node.name];
+        const currentPath = [
+            ...nodePath,
+            node.name
+        ];
 
         const scopes = resolveScopes(
             node,
-            inheritedScopes
+            inheritedConditions,
+            nodePath.length === 0
         );
 
         const resolvedNode: ResolvedNode = {
@@ -55,10 +64,17 @@ function flattenNodeTree(
 
         flattenedTree.push(resolvedNode);
 
+        const childInheritedConditions =
+            getChildInheritedConditions(
+                node,
+                scopes,
+                inheritedConditions
+            );
+
         flattenedTree.push(
             ...flattenNodeTree(
                 node.children,
-                scopes,
+                childInheritedConditions,
                 currentPath
             )
         );
@@ -69,45 +85,55 @@ function flattenNodeTree(
 
 function resolveScopes(
     node: PortraitNode,
-    inheritedScopes: ResolvedScope[]
+    inheritedConditions: Map<Scope, Node[]>,
+    isRoot: boolean
 ): ResolvedScope[] {
-    if (
-        node.scopes.length === 0 &&
-        inheritedScopes.length === 0
-    ) {
-        return DEFAULT_SCOPES.map(scope => ({
-            scope,
-            positiveConditions: [],
-            negativeConditions: []
-        }));
-    }
+    const scopeEntities =
+        node.scopes.length === 0 && isRoot
+            ? DEFAULT_SCOPES.map(
+                scope => ({
+                    scope,
+                    conditions: []
+                })
+            )
+            : node.scopes;
 
-    const scopes = inheritedScopes.map(scope => ({
-        scope: scope.scope,
-        positiveConditions: [...scope.positiveConditions],
-        negativeConditions: []
-    }));
+    return scopeEntities.map(scopeEntity => {
+        const positiveConditions =
+            inheritedConditions.get(scopeEntity.scope) ?? [];
 
-    for (const scopeEntity of node.scopes) {
-        const existing = scopes.find(
-            scope => scope.scope === scopeEntity.scope
-        );
-
-        if (existing) {
-            existing.positiveConditions.push(
+        return {
+            scope: scopeEntity.scope,
+            positiveConditions: [
+                ...positiveConditions,
                 ...scopeEntity.conditions
-            );
-        } else {
-            scopes.push({
-                scope: scopeEntity.scope,
-                positiveConditions: [...scopeEntity.conditions],
-                negativeConditions: []
-            });
-        }
+            ],
+            negativeConditions: []
+        };
+    });
+}
+
+function getChildInheritedConditions(
+    node: PortraitNode,
+    scopes: ResolvedScope[],
+    inheritedConditions: Map<Scope, Node[]>
+): Map<Scope, Node[]> {
+    if (node.scopes.length === 0) {
+        return inheritedConditions;
     }
 
-    return scopes;
-}   
+    const childInheritedConditions =
+        new Map<Scope, Node[]>();
+
+    for (const scope of scopes) {
+        childInheritedConditions.set(
+            scope.scope,
+            [...scope.positiveConditions]
+        );
+    }
+
+    return childInheritedConditions;
+} 
 
 function resolveNegativeConditions(
     flattenedNodes: ResolvedNode[]

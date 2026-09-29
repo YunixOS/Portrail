@@ -11,7 +11,7 @@ export class PortraitNode {
     ){}
 
     children: PortraitNode[] = [];
-    conditions: Node[] = [];
+    globalConditions: Node[] = [];
 
     addNode(name: string): PortraitNode {
         const node = new PortraitNode(name.toLowerCase().replace(/ /g,"_"));
@@ -20,12 +20,19 @@ export class PortraitNode {
     }
 
     addCondition(condition: Node): PortraitNode {
-        this.conditions.push(condition);
+        this.globalConditions.push(condition);
+
+        for (const scope of this.scopes) {
+            if(scope.inherit) {
+                scope.addCondition(condition);
+            }
+        }
+
         return this;
     }
     
     addConditionContainer(name: string): Container {
-        const existing = this.conditions.find(
+        const existing = this.globalConditions.find(
             condition =>
                 condition instanceof Container &&
                 condition.name === name
@@ -36,13 +43,20 @@ export class PortraitNode {
         }
 
         const container = new Container(name);
-        this.conditions.push(container);
+        
+        for (const scope of this.scopes) {
+            if(scope.inherit) {
+                scope.addCondition(container);
+            }
+        }
+        
+        this.globalConditions.push(container);
 
         return container;
     }
     
     addConditionClause(key: string, value: Value): PortraitNode {
-        const existing = this.conditions.find(
+        const existing = this.globalConditions.find(
             condition =>
                 condition instanceof Clause &&
                 condition.name === key &&
@@ -54,13 +68,20 @@ export class PortraitNode {
         }
         
         const clause = new Clause(key, value);
-        this.conditions.push(clause);
+        
+        for (const scope of this.scopes) {
+            if(scope.inherit) {
+                scope.addCondition(clause);
+            }
+        }
+        
+        this.globalConditions.push(clause);
 
         return this;
     }
     
     addConditionUnit(value: Value): PortraitNode {
-        const existing = this.conditions.find(
+        const existing = this.globalConditions.find(
             condition =>
                 condition instanceof Unit &&
                 condition.value === value
@@ -71,34 +92,44 @@ export class PortraitNode {
         }
         
         const unit = new Unit(value);
-        this.conditions.push(unit);
+        
+        for (const scope of this.scopes) {
+            if(scope.inherit) {
+                scope.addCondition(unit);
+            } 
+        }
+
+        this.globalConditions.push(unit);
         
         return this;
     }
 
     addScope(scope: Scope, inherit: boolean = true): ScopeEntity {
-        const scopeEntity = new ScopeEntity(scope);
+        const scopeEntity = new ScopeEntity(scope, inherit);
         if (inherit) {
-            scopeEntity.addConditions(this.conditions);
+            scopeEntity.addConditions(this.globalConditions);
         }
         this.scopes.push(scopeEntity);
         return scopeEntity;
     }
     
-    addScopes(scopes: Scope[], inherit: boolean = true): ScopeEntity[] {
-        const addedScopes: ScopeEntity[] = [];
-        scopes.forEach((scope) => {
-            const scopeEntity = new ScopeEntity(scope);
-            if (inherit) {
-                scopeEntity.addConditions(this.conditions);
-            }
-            
-            addedScopes.push(scopeEntity);
-        });
+    addScopes(
+        scopes: Scope[],
+        inherit: boolean = true
+    ): ScopeEntity[] {
+        return scopes.map(
+            scope => this.addScope(scope, inherit)
+        );
+    }
+    
+    scope(scope: Scope) {
+        const foundScope = this.scopes.find((nodeScope) => nodeScope.scope === scope);
         
-        this.scopes.push(...addedScopes);
+        if (!foundScope) {
+            return this.addScope(scope);
+        }
         
-        return addedScopes;
+        return foundScope;
     }
 
     usePortraits(directory: PortraitDirectory): void {

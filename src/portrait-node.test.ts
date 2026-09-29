@@ -1,64 +1,79 @@
 import { PortraitDirectory } from "./filesystem/portrait-directory";
 import { PortraitNode } from "./portrait-node";
-import { Clause, Container, Unit } from "@yunixos/paradoxical";
+import { Clause, Unit } from "@yunixos/paradoxical";
 
 describe("PortraitNode", () => {
-    it("Adds child node", () => {
-        const node = new PortraitNode("yryr");
-        const childNode = node.addNode("yui");
+    it("adds child node", () => {
+        const node = new PortraitNode("test");
+        const childNode = node.addNode("test2");
 
         expect(node.children[0]).toBe(childNode);
     });
     
     describe("Conditions", () => {
-        it("Adds conditions", () => {
-            const node = new PortraitNode("yui");
-            const condition = new Clause("has_trait", "cool");
+        it("adds conditions", () => {
+            const node = new PortraitNode("test");
+            const condition = new Clause("condition", true);
             node.addCondition(condition);
 
-            expect(node.conditions[0]).toBe(condition);
+            expect(node.globalConditions[0]).toBe(condition);
         });
         
-        it("Adds container conditions", () => {
-            const node = new PortraitNode("yui");
+        it("adds container conditions", () => {
+            const node = new PortraitNode("test");
             const container = node.addConditionContainer("OR");
             
-            expect(node.conditions[0]).toBe(container);
+            expect(node.globalConditions[0]).toBe(container);
         });
         
-        it("Adds clause conditions", () => {
-            const node = new PortraitNode("yui");
-            node.addConditionClause("age", 14);
+        it("adds clause conditions", () => {
+            const node = new PortraitNode("test");
+            node.addConditionClause("condition", true);
             
-            expect(node.conditions[0]).toBeInstanceOf(Clause);
+            expect(node.globalConditions[0]).toBeInstanceOf(Clause);
         });
         
-        it("Adds unit conditions", () => {
-            const node = new PortraitNode("yui");
+        it("adds unit conditions", () => {
+            const node = new PortraitNode("test");
             node.addConditionUnit("unit");
             
-            expect(node.conditions[0]).toBeInstanceOf(Unit);
+            expect(node.globalConditions[0]).toBeInstanceOf(Unit);
+        });
+        
+        it("applies conditions to all scopes", () => {
+            const node = new PortraitNode("test");
+            
+            node.addScope("leader");
+            
+            node.addConditionUnit("test1");
+
+            node.addScope("pop");
+            
+            node.addConditionUnit("test2");
+            
+            node.addScope("ruler");
+
+            for (const scope of node.scopes) {
+                expect(scope.conditions).toHaveLength(2);
+
+                expect(scope.conditions).toEqual(
+                    expect.arrayContaining([
+                        expect.objectContaining({ value: "test1" }),
+                        expect.objectContaining({ value: "test2" })
+                    ])
+                );
+            }
         });
     }); 
 
-    it("Adds nested conditions", () => {
-        const node = new PortraitNode("yui");
-        const condition = new Container("OR");
-        condition.addClause("has_trait", "cool");
-        condition.addClause("has_trait", "super_cool");
-        node.addCondition(condition);
-
-        expect(node.conditions[0]).toBe(condition);
-    });
-
-    it("Adds scopes", () => {
+    it("adds a scope", () => {
         const node = new PortraitNode("yui");
         const scope = node.addScope("ruler");
         
         expect(node.scopes).toContain(scope);
     });
     
-    it("Adds portraits", () => {
+    it("adds portraits", () => {
         const node = new PortraitNode("yui");
         const portraits = new PortraitDirectory(
             "default", 
@@ -76,7 +91,7 @@ describe("PortraitNode", () => {
             .addConditionClause("hair", "black")
             .addConditionClause("age", 14);
 
-        expect(node.conditions).toEqual(
+        expect(node.globalConditions).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
                     name: "hair",
