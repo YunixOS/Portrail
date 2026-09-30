@@ -24,10 +24,10 @@ portrait_groups = {
 					leader_class = "commander"
 				}
 				portraits = {
-					"pg_test_default_cool_leaders_commander_0"
-					"pg_test_default_cool_leaders_commander_1"
-					"pg_test_default_cool_leaders_commander_2"
-					"pg_test_default_cool_leaders_commander_3"
+					pg_test_default_cool_leaders_commander_0
+					pg_test_default_cool_leaders_commander_1
+					pg_test_default_cool_leaders_commander_2
+					pg_test_default_cool_leaders_commander_3
 				}
 			}
 		}
@@ -40,10 +40,10 @@ portrait_groups = {
 					leader_class = "commander"
 				}
 				portraits = {
-					"pg_test_default_cool_leaders_commander_0"
-					"pg_test_default_cool_leaders_commander_1"
-					"pg_test_default_cool_leaders_commander_2"
-					"pg_test_default_cool_leaders_commander_3"
+					pg_test_default_cool_leaders_commander_0
+					pg_test_default_cool_leaders_commander_1
+					pg_test_default_cool_leaders_commander_2
+					pg_test_default_cool_leaders_commander_3
 				}
 			}
 		}

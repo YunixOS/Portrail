@@ -24,10 +24,10 @@ portrait_groups = {
 					leader_class = "scientist"
 				}
 				portraits = {
-					"pg_test_default_cool_leaders_scientist_0"
-					"pg_test_default_cool_leaders_scientist_1"
-					"pg_test_default_cool_leaders_scientist_2"
-					"pg_test_default_cool_leaders_scientist_3"
+					pg_test_default_cool_leaders_scientist_0
+					pg_test_default_cool_leaders_scientist_1
+					pg_test_default_cool_leaders_scientist_2
+					pg_test_default_cool_leaders_scientist_3
 				}
 			}
 		}

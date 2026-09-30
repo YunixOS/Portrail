@@ -23,10 +23,10 @@ portrait_groups = {
 					}
 				}
 				portraits = {
-					"pg_test_default_cool_0"
-					"pg_test_default_cool_1"
-					"pg_test_default_cool_2"
-					"pg_test_default_cool_3"
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
 				}
 			}
 		}
@@ -38,10 +38,10 @@ portrait_groups = {
 					}
 				}
 				portraits = {
-					"pg_test_default_cool_0"
-					"pg_test_default_cool_1"
-					"pg_test_default_cool_2"
-					"pg_test_default_cool_3"
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
 				}
 			}
 		}
@@ -57,10 +57,10 @@ portrait_groups = {
 					}
 				}
 				portraits = {
-					"pg_test_default_cool_0"
-					"pg_test_default_cool_1"
-					"pg_test_default_cool_2"
-					"pg_test_default_cool_3"
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
 				}
 			}
 		}
@@ -75,10 +75,10 @@ portrait_groups = {
 					}
 				}
 				portraits = {
-					"pg_test_default_cool_0"
-					"pg_test_default_cool_1"
-					"pg_test_default_cool_2"
-					"pg_test_default_cool_3"
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
 				}
 			}
 		}
@@ -88,10 +88,10 @@ portrait_groups = {
 					has_trait = "trait_cool"
 				}
 				portraits = {
-					"pg_test_default_cool_0"
-					"pg_test_default_cool_1"
-					"pg_test_default_cool_2"
-					"pg_test_default_cool_3"
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
 				}
 			}
 		}

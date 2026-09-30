@@ -122,7 +122,7 @@ function generatePortraitNode(
             const [i] of
             resolvedNode.node.portraits.portraits.entries()
         ) {
-            portraits.addUnit(`${id}_${i}`);
+            portraits.addUnit(keyword(`${id}_${i}`));
         }
     }
 

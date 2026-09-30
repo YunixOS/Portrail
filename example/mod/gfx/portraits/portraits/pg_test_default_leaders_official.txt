@@ -21,10 +21,10 @@ portrait_groups = {
 					leader_class = "official"
 				}
 				portraits = {
-					"pg_test_default_leaders_official_0"
-					"pg_test_default_leaders_official_1"
-					"pg_test_default_leaders_official_2"
-					"pg_test_default_leaders_official_3"
+					pg_test_default_leaders_official_0
+					pg_test_default_leaders_official_1
+					pg_test_default_leaders_official_2
+					pg_test_default_leaders_official_3
 				}
 			}
 		}
@@ -34,25 +34,10 @@ portrait_groups = {
 					leader_class = "official"
 				}
 				portraits = {
-					"pg_test_default_leaders_official_0"
-					"pg_test_default_leaders_official_1"
-					"pg_test_default_leaders_official_2"
-					"pg_test_default_leaders_official_3"
-				}
-			}
-		}
-		species = {
-			add = {
-				trigger = {
-					NOR = {
-						has_trait = "trait_cool"
-					}
-				}
-				portraits = {
-					"pg_test_default_leaders_official_0"
-					"pg_test_default_leaders_official_1"
-					"pg_test_default_leaders_official_2"
-					"pg_test_default_leaders_official_3"
+					pg_test_default_leaders_official_0
+					pg_test_default_leaders_official_1
+					pg_test_default_leaders_official_2
+					pg_test_default_leaders_official_3
 				}
 			}
 		}
