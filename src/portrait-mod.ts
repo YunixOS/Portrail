@@ -53,8 +53,12 @@ export class PortraitMod {
 
     portraitGroups: PortraitGroup[] = [];
     
-    createPortraitGroup(relativePath: string): PortraitGroup {
+    createPortraitGroup(relativePath: string, defaultPortrait?: string): PortraitGroup {
         const portraitGroup = new PortraitGroup(this.portraitDir, relativePath);
+        
+        if (defaultPortrait) {
+            portraitGroup.setDefaultPortrait(defaultPortrait);
+        } 
         
         portraitGroup.constructNodes(); 
         

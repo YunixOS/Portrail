@@ -116,7 +116,7 @@ function getChildInheritedConditions(
     scopes: ResolvedScope[],
     inheritedConditions: Map<Scope, Node[]>
 ): Map<Scope, Node[]> {
-    if (node.scopes.length === 0) {
+    if (!node.configured) {
         return inheritedConditions;
     }
 

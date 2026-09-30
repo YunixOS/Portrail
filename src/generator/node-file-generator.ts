@@ -95,41 +95,43 @@ function generatePortraitNode(
         );
     }
 
-    for (const resolvedScope of resolvedNode.scopes) {
-        const scope =
-            portraitGroup.addContainer(resolvedScope.scope);
+    if (portraits.length > 0) {
+        for (const resolvedScope of resolvedNode.scopes) {
+            const scope =
+                portraitGroup.addContainer(resolvedScope.scope);
 
-        const add =
-            scope.addContainer("add");
+            const add =
+                scope.addContainer("add");
 
-        if (
-            resolvedScope.positiveConditions.length > 0 ||
-            resolvedScope.negativeConditions.length > 0
-        ) {
-            const trigger =
-                add.addContainer("trigger");
+            if (
+                resolvedScope.positiveConditions.length > 0 ||
+                resolvedScope.negativeConditions.length > 0
+            ) {
+                const trigger =
+                    add.addContainer("trigger");
 
-            for (const condition of resolvedScope.positiveConditions) {
-                trigger.add(condition);
-            }
+                for (const condition of resolvedScope.positiveConditions) {
+                    trigger.add(condition);
+                }
 
-            if (resolvedScope.negativeConditions.length > 0) {
-                const nor =
-                    trigger.addContainer("NOR");
+                if (resolvedScope.negativeConditions.length > 0) {
+                    const nor =
+                        trigger.addContainer("NOR");
 
-                for (const condition of resolvedScope.negativeConditions) {
-                    nor.add(condition);
+                    for (const condition of resolvedScope.negativeConditions) {
+                        nor.add(condition);
+                    }
                 }
             }
-        }
 
-        const scopePortraits =
-            add.addContainer("portraits");
+            const scopePortraits =
+                add.addContainer("portraits");
 
-        for (const [i] of portraits.entries()) {
-            scopePortraits.addUnit(
-                keyword(`${id}_${i}`)
-            );
+            for (const [i] of portraits.entries()) {
+                scopePortraits.addUnit(
+                    keyword(`${id}_${i}`)
+                );
+            }
         }
     }
 
