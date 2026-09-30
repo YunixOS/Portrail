@@ -94,7 +94,7 @@ describe("PortraitGroup", () => {
             const group = new PortraitGroup(
                 root,
                 "default group"
-            )
+            );
             
             expect(group.name).toBe("default_group");
         });
@@ -106,6 +106,8 @@ describe("PortraitGroup", () => {
                 root,
                 "default"
             );
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
             
             group.constructNodes();
 
@@ -119,6 +121,8 @@ describe("PortraitGroup", () => {
 
         it("builds nested nodes recursively", () => {
             const group = new PortraitGroup(root, "default");
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
             
             group.constructNodes();
 
@@ -135,6 +139,8 @@ describe("PortraitGroup", () => {
 
         it("creates the expected node hierarchy", () => {
             const group = new PortraitGroup(root, "default");
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
             
             group.constructNodes();
 
@@ -158,6 +164,8 @@ describe("PortraitGroup", () => {
         it("attaches portrait directories to nodes", () => {
             const group = new PortraitGroup(root, "default");
             
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
+            
             group.constructNodes();
 
             const cyborg = group.node("cyborg");
@@ -176,6 +184,8 @@ describe("PortraitGroup", () => {
         it("finds a top-level node", () => {
             const group = new PortraitGroup(root, "default");
             
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
+            
             group.constructNodes();
 
             const node = group.node("cyborg");
@@ -185,6 +195,8 @@ describe("PortraitGroup", () => {
         
         it("finds nested nodes", () => {
             const group = new PortraitGroup(root, "default");
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
             
             group.constructNodes();
 
@@ -198,6 +210,8 @@ describe("PortraitGroup", () => {
         it("ignores empty path components", () => {
             const group = new PortraitGroup(root, "default");
             
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
+            
             group.constructNodes();
 
             expect(
@@ -209,6 +223,8 @@ describe("PortraitGroup", () => {
         
         it("throws when a node does not exist", () => {
             const group = new PortraitGroup(root, "default");
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
 
             expect(() =>
                 group.node("cyborg/unknown")
@@ -217,6 +233,8 @@ describe("PortraitGroup", () => {
         
         it("throws when given an empty path", () => {
             const group = new PortraitGroup(root, "default");
+            
+            group.setDefaultPortrait("gfx/models/portraits/default.dds");
             
             group.constructNodes();
 

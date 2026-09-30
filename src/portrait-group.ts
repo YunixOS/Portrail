@@ -44,6 +44,8 @@ export class PortraitGroup {
     dir: string; 
 
     private portraitDirectory?: PortraitDirectory;
+    
+    private _defaultPortrait?: string; 
 
     /**
      * Creates a portrait group.
@@ -83,6 +85,14 @@ export class PortraitGroup {
     }
     
     /**
+     * Gets the default portrait of the portrait group. Used as the group icon in empire creation.
+     * @see {@link constructNodes}
+     */
+    get defaultPortrait(): string | undefined {
+        return this._defaultPortrait;
+    }
+    
+    /**
      * Gets the root node of the portrait group (if it has been constructed).
      * @see {@link constructNodes}
      */
@@ -95,6 +105,23 @@ export class PortraitGroup {
         }
 
         return this._defaultNode;
+    }
+    
+    /**
+     * Sets the default portrait of the group (used as group icon in empire creation).
+     * 
+     * @param portrait - Full path of portrait relative to gfx directory.
+     * 
+     * @example
+     * ```ts
+     * group.setDefaultPortrait(
+     *      "gfx/models/portraits/default_portraits/1.dds",
+     * );
+     * ```
+     */
+    setDefaultPortrait(portrait: string): this {
+        this._defaultPortrait = portrait;
+        return this;
     }
 
     /**
@@ -115,6 +142,21 @@ export class PortraitGroup {
         );
         
         this._defaultNode = this.mirrorNodeTree(this.portraitDirectory);
+        
+        if (!this._defaultPortrait) {
+            const defaultPortrait =
+                this.portraitDirectory.portraits[0];
+
+            if (!defaultPortrait) {
+                throw new Error(
+                    `Portrait group "${this.name}" has no default portrait. ` +
+                    "Specify one with setDefaultPortrait() or place at least " +
+                    "one portrait in the group's default directory."
+                );
+            }
+
+            this._defaultPortrait = defaultPortrait;
+        }
     }
     
     /**

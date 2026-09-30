@@ -17,7 +17,7 @@ export function generate(
     for (const node of resolvedNodes) {
         files.push(
             ...generatePortraitNode(
-                group.name,
+                group,
                 node,
                 outputPath
             )
@@ -28,25 +28,22 @@ export function generate(
 }
 
 function generatePortraitNode(
-    groupName: string,
+    group: PortraitGroup,
     resolvedNode: ResolvedNode,
     outputPath: string,
 ): ModFile[] {
     const isRootNode =
         resolvedNode.path.length === 1 &&
-        resolvedNode.path[0] === groupName;
+        resolvedNode.path[0] === group.name;
 
     const id = resolvedNode.path.join("_");
 
-    if (!resolvedNode.node.portraits) {
-        throw new Error(
-            `Cannot generate portrait node "${id}" because it has no` + 
-            "portraits or subnodes with portraits. This node currently" +
-            "serves no purpose"
-        );
-    }
+    const portraits = resolvedNode.node.portraits?.portraits ?? [];
 
-    if (resolvedNode.node.portraits.portraits.length < 1) {
+    if (
+        portraits.length === 0 &&
+        !(isRootNode && group.defaultPortrait)
+    ) {
         console.warn(
             `Portrait node "${id}" has no portraits: skipping generation`
         );
@@ -61,10 +58,8 @@ function generatePortraitNode(
 
     const portraitImports = file.addContainer("portraits");
 
-    for (
-        const [i, portrait] of
-        resolvedNode.node.portraits.portraits.entries()
-    ) {
+    // Normal node portraits
+    for (const [i, portrait] of portraits.entries()) {
         const portraitImport =
             portraitImports.addContainer(`${id}_${i}`);
 
@@ -74,55 +69,67 @@ function generatePortraitNode(
         );
     }
 
+    // Group default portrait
+    if (isRootNode && group.defaultPortrait) {
+        const defaultId = `${id}_default`;
+
+        const portraitImport =
+            portraitImports.addContainer(defaultId);
+
+        portraitImport.addClause(
+            "texturefile",
+            group.defaultPortrait
+        );
+    }
+
     const portraitGroups =
         file.addContainer("portrait_groups");
 
-    const group =
-        portraitGroups.addContainer(groupName);
-
-    if (isRootNode) {
-        group.addClause(
+    const portraitGroup =
+        portraitGroups.addContainer(group.name);
+    
+    if (isRootNode && group.defaultPortrait) {
+        portraitGroup.addClause(
             "default",
-            keyword(`${id}_0`)
+            keyword(`${id}_default`)
         );
     }
 
     for (const resolvedScope of resolvedNode.scopes) {
-        const scope = group.addContainer(
-            resolvedScope.scope
-        );
+        const scope =
+            portraitGroup.addContainer(resolvedScope.scope);
 
-        const add = scope.addContainer("add");
+        const add =
+            scope.addContainer("add");
 
         if (
             resolvedScope.positiveConditions.length > 0 ||
             resolvedScope.negativeConditions.length > 0
         ) {
-            const trigger = add.addContainer("trigger");
+            const trigger =
+                add.addContainer("trigger");
 
             for (const condition of resolvedScope.positiveConditions) {
                 trigger.add(condition);
             }
 
             if (resolvedScope.negativeConditions.length > 0) {
-                const nor = trigger.addContainer("NOR");
+                const nor =
+                    trigger.addContainer("NOR");
 
-                for (
-                    const condition of
-                    resolvedScope.negativeConditions
-                ) {
+                for (const condition of resolvedScope.negativeConditions) {
                     nor.add(condition);
                 }
             }
         }
 
-        const portraits = add.addContainer("portraits");
+        const scopePortraits =
+            add.addContainer("portraits");
 
-        for (
-            const [i] of
-            resolvedNode.node.portraits.portraits.entries()
-        ) {
-            portraits.addUnit(keyword(`${id}_${i}`));
+        for (const [i] of portraits.entries()) {
+            scopePortraits.addUnit(
+                keyword(`${id}_${i}`)
+            );
         }
     }
 

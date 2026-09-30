@@ -12,9 +12,15 @@ export class PortraitSet {
     addPortraitGroup(portraitGroup: PortraitGroup) {
         this.portraitGroups.push(portraitGroup);
 
-        return portraitGroup
+        return portraitGroup;
     }
     
+    addPortraitGroups(portraitGroups: PortraitGroup[]) {
+        this.portraitGroups.push(...portraitGroups);
+
+        return portraitGroups;
+    }
+ 
     writeFile(path: string) {
         const file = generate(this, path);
         

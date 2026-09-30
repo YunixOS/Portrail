@@ -52,8 +52,7 @@ function flattenNodeTree(
 
         const scopes = resolveScopes(
             node,
-            inheritedConditions,
-            nodePath.length === 0
+            inheritedConditions
         );
 
         const resolvedNode: ResolvedNode = {
@@ -85,11 +84,10 @@ function flattenNodeTree(
 
 function resolveScopes(
     node: PortraitNode,
-    inheritedConditions: Map<Scope, Node[]>,
-    isRoot: boolean
+    inheritedConditions: Map<Scope, Node[]>
 ): ResolvedScope[] {
     const scopeEntities =
-        node.scopes.length === 0 && isRoot
+        !node.configured
             ? DEFAULT_SCOPES.map(
                 scope => ({
                     scope,

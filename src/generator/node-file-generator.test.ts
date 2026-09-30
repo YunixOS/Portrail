@@ -32,23 +32,4 @@ describe("generate()", () => {
 
         expect(files).toHaveLength(1);
     });
-
-    it("throws when a node has no portraits", () => {
-        
-
-        const node = new PortraitNode("cyborg");
-        
-        const group = new PortraitGroup(
-            "./mod/gfx/models/portraits",
-            "default",
-            node
-        );
-
-        expect(() => {
-            generate(
-                group,
-                "./output"
-            );
-        }).toThrow();
-    });
 });

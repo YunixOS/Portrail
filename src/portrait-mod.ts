@@ -63,6 +63,12 @@ export class PortraitMod {
         return portraitGroup;
     }
     
+    createPortraitGroups(relativePaths: string[]): PortraitGroup[] {
+        return relativePaths.map(
+            relativePath => this.createPortraitGroup(relativePath)
+        );
+    }
+    
     write(): void {
         this.portraitCategories.forEach((category) => {
             category.writeFile(this.categoryDir);

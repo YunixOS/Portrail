@@ -6,12 +6,17 @@ import type { Scope } from "./types";
 export class PortraitNode {
     constructor(
         public readonly name: string,
-        public scopes: ScopeEntity[] = [],
+        private _scopes: ScopeEntity[] = [],
         public portraits?: PortraitDirectory
     ){}
 
     children: PortraitNode[] = [];
     globalConditions: Node[] = [];
+    configured: boolean = false; 
+        
+    get scopes() {
+        return this._scopes;
+    }
 
     addNode(name: string): PortraitNode {
         const node = new PortraitNode(name.toLowerCase().replace(/ /g,"_"));
@@ -105,11 +110,13 @@ export class PortraitNode {
     }
 
     addScope(scope: Scope, inherit: boolean = true): ScopeEntity {
+        this.configured = true;
+
         const scopeEntity = new ScopeEntity(scope, inherit);
         if (inherit) {
             scopeEntity.addConditions(this.globalConditions);
         }
-        this.scopes.push(scopeEntity);
+        this._scopes.push(scopeEntity);
         return scopeEntity;
     }
     
