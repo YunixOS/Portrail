@@ -6,7 +6,7 @@ import {
 import { PortraitCategory } from "../portrait-category";
 
 export default function generate(category: PortraitCategory, path: string): ModFile {
-    const categoryFile = new ModFile(path, category.id);
+    const categoryFile = new ModFile(path, `${category.id}.txt`);
     
     const categoryContainer = categoryFile.addContainer(category.id);
     categoryContainer.addClause("name", category.name);

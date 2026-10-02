@@ -6,7 +6,7 @@ import {
 import { PortraitSet } from "../portrait-set";
 
 export default function generate(set: PortraitSet, path: string): ModFile { 
-    const setFile = new ModFile(path, set.id);
+    const setFile = new ModFile(path, `${set.id}.txt`);
     
     const setContainer = setFile.addContainer(set.id);
     setContainer.addClause("species_class", keyword(set.speciesClass));
