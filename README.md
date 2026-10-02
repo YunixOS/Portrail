@@ -22,7 +22,7 @@ You should then be able to copy the generated package file into your project and
 Download the pre-built package from the releases section and copy it into the root directory of your project. Use ```npm install <path/to/package>``` to install.
 
 # Usage
-Once portrait is installed, you can create a new JS/TS file and add the following import:
+Once Portrail is installed, you can create a new JS/TS file and add the following import (make sure you are using ES6 modules):
 ```JS
 import { PortraitMod } from "portrail";
 ```
