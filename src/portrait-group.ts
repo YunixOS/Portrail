@@ -83,7 +83,7 @@ export class PortraitGroup {
     ) {
         this.name = path.basename(this.relativePath)
             .replace(/\s+/g, "_")
-            .replace(/[^a-z0-9_]/g, "_");
+            .replace(/[^a-zA-Z0-9_]/g, "_");
         
         this.dir = path.join(
             this.absolutePortraitsDir,

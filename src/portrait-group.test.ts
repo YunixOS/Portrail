@@ -90,13 +90,13 @@ describe("PortraitGroup", () => {
     });
     
     describe("init", () => {
-        it("replaces spaces in name with underscores", () => {
+        it("replaces special characters in name with underscores", () => {
             const group = new PortraitGroup(
                 root,
-                "default group"
+                "+@Default - Group*&"
             );
             
-            expect(group.name).toBe("default_group");
+            expect(group.name).toBe("__Default___Group__");
         });
     });
 
