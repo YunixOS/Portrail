@@ -9,7 +9,7 @@ import path from "node:path"
  * Represents a group of portraits and their hierarchical configuration.
  *
  * A portrait group corresponds to a directory within the mod's
- * `gfx/models/portraits` directory. Portraits and their child nodes can be
+ * `gfx/models/portraits` directory. Child nodes of the group can be
  * loaded automatically from the filesystem using {@link constructNodes}.
  *
  * The root node of the group is available through {@link defaultNode}.
@@ -32,8 +32,8 @@ export class PortraitGroup {
     /**
      * The name used to identify the portrait group in generated files.
      *
-     * The name is derived from {@link relativePath} by taking the basename,
-     * converting it to lowercase and replacing special characters with underscores.
+     * The name is derived from {@link relativePath} by taking the basename
+     * and replacing special characters with underscores.
      */
     name: string;
 
@@ -43,8 +43,16 @@ export class PortraitGroup {
      */
     dir: string; 
 
+    /**
+     * The root {@link PortraitDirectory} for this group.
+     */
     private portraitDirectory?: PortraitDirectory;
     
+    /**
+     * The default portrait for this group. This is the portrait/image that will
+     * serve as the "icon" or image for the group in various location such as
+     * empire creation.
+     */
     private _defaultPortrait?: string; 
 
     /**
@@ -64,7 +72,7 @@ export class PortraitGroup {
      * ```ts
      * const group = new PortraitGroup(
      *     "/path/to/mod/gfx/models/portraits",
-     *     "humanoid"
+     *     "groups/humanoid"
      * );
      * ```
      */
@@ -74,7 +82,6 @@ export class PortraitGroup {
         private _defaultNode?: PortraitNode
     ) {
         this.name = path.basename(this.relativePath)
-            .toLowerCase()
             .replace(/\s+/g, "_")
             .replace(/[^a-z0-9_]/g, "_");
         
@@ -85,7 +92,8 @@ export class PortraitGroup {
     }
     
     /**
-     * Gets the default portrait of the portrait group. Used as the group icon in empire creation.
+     * Gets the default portrait of the portrait group.
+     * Used as the group icon in empire creation.
      * @see {@link constructNodes}
      */
     get defaultPortrait(): string | undefined {
@@ -125,10 +133,10 @@ export class PortraitGroup {
     }
 
     /**
-     * Loads the portrait directory and constructs the corresponding
+     * Loads the {@link PortraitDirectory} and constructs the corresponding
      * {@link PortraitNode} tree.
      *
-     * The resulting tree mirrors the directory structure beneath the
+     * The resulting tree mirrors the directory structure within the
      * portrait group's directory. `.dds` files are associated with the
      * corresponding nodes as portraits.
      *
@@ -164,7 +172,7 @@ export class PortraitGroup {
      * {@link PortraitNode} tree.
      *
      * @param directory - The directory to convert.
-     * @returns The root node corresponding to the supplied directory.
+     * @returns The node (and children) corresponding to the supplied directory.
      */
     private mirrorNodeTree(
         directory: PortraitDirectory
@@ -183,7 +191,7 @@ export class PortraitGroup {
     }
     
     /**
-     * Retrieves a portrait node using its path within the portrait group.
+     * Retrieves a {@link PortraitNode} using its path within the group.
      *
      * Paths use `/` as the separator and are relative to the group's root
      * node.
@@ -230,7 +238,7 @@ export class PortraitGroup {
     }
     
     /**
-     * Creates a Paradoxical ModFile object for each {@link PortraitNode} in the group.
+     * Creates a Paradoxical ModFile for each {@link PortraitNode} in the group.
      *
      * @param modPath - The root path of the mod to generate files for.
      * @returns The generated mod files.
@@ -252,13 +260,12 @@ export class PortraitGroup {
     }
     
     /**
-     * Generates and writes the node mod files for this portrait group.
+     * Generates and writes the node files for this portrait group to disk.
      *
      * @param modPath - The root path of the mod.
      *
      * @example
      * ```ts
-     * group.constructNodes();
      * group.writeFiles("/path/to/mod");
      * ```
      */
