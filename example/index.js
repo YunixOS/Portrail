@@ -35,7 +35,7 @@ group.node("cool")
          "ruler"
      ]);
 
-// By default, cool scopes should scope into species and
+// By default, the cool nodes scope conditions should scope into species and
 // check for trait_cool.
 group.node("cool")
     .addConditionContainer("species")
