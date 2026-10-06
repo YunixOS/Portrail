@@ -19,7 +19,10 @@ export class PortraitNode {
     }
 
     addNode(name: string): PortraitNode {
-        const node = new PortraitNode(name.toLowerCase().replace(/ /g,"_"));
+        const node = new PortraitNode(
+            name.replace(/\s+/g, "_")
+                .replace(/[^a-zA-Z0-9_]/g, "_")
+        );
         this.children.push(node);
         return node;
     }

@@ -8,9 +8,8 @@ export default class PortraitLoader {
         dir: string
     ): PortraitDirectory {
         const name = path.basename(dir)
-            .toLowerCase()
             .replace(/\s+/g, "_")
-            .replace(/[^a-z0-9_]/g, "_");
+            .replace(/[^a-zA-Z0-9_]/g, "_");
         const relativePath = path.relative(root, dir);
         const dirEntries = readdirSync(dir, {
             withFileTypes: true

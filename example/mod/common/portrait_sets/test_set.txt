@@ -1,6 +1,6 @@
 test_set = {
 	species_class = HUM
 	portraits = {
-		"pg_test_default"
+		"00_PG_test_default"
 	}
 }
