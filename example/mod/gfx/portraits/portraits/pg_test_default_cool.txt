@@ -1,0 +1,99 @@
+portraits = {
+	pg_test_default_cool_0 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/1.dds"
+	}
+	pg_test_default_cool_1 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/2.dds"
+	}
+	pg_test_default_cool_2 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/3.dds"
+	}
+	pg_test_default_cool_3 = {
+		texturefile = "gfx/models/portraits/groups/pg_test_default/cool/4.dds"
+	}
+}
+
+portrait_groups = {
+	pg_test_default = {
+		game_setup = {
+			add = {
+				trigger = {
+					species = {
+						has_trait = "trait_cool"
+					}
+				}
+				portraits = {
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
+				}
+			}
+		}
+		pop = {
+			add = {
+				trigger = {
+					species = {
+						has_trait = "trait_cool"
+					}
+				}
+				portraits = {
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
+				}
+			}
+		}
+		leader = {
+			add = {
+				trigger = {
+					species = {
+						has_trait = "trait_cool"
+					}
+					NOR = {
+						leader_class = "commander"
+						leader_class = "scientist"
+					}
+				}
+				portraits = {
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
+				}
+			}
+		}
+		ruler = {
+			add = {
+				trigger = {
+					species = {
+						has_trait = "trait_cool"
+					}
+					NOR = {
+						leader_class = "commander"
+					}
+				}
+				portraits = {
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
+				}
+			}
+		}
+		species = {
+			add = {
+				trigger = {
+					has_trait = "trait_cool"
+				}
+				portraits = {
+					pg_test_default_cool_0
+					pg_test_default_cool_1
+					pg_test_default_cool_2
+					pg_test_default_cool_3
+				}
+			}
+		}
+	}
+}
