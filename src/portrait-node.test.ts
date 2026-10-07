@@ -67,14 +67,14 @@ describe("PortraitNode", () => {
     }); 
 
     it("adds a scope", () => {
-        const node = new PortraitNode("yui");
+        const node = new PortraitNode("node");
         const scope = node.addScope("ruler");
         
         expect(node.scopes).toContain(scope);
     });
     
     it("adds portraits", () => {
-        const node = new PortraitNode("yui");
+        const node = new PortraitNode("node");
         const portraits = new PortraitDirectory(
             "default", 
             "path",
@@ -87,18 +87,18 @@ describe("PortraitNode", () => {
     });
     
     it("supports method chaining", () => {
-        const node = new PortraitNode("yui")
-            .addConditionClause("hair", "black")
-            .addConditionClause("age", 14);
+        const node = new PortraitNode("node")
+            .addConditionClause("key", "value")
+            .addConditionClause("number", 14);
 
         expect(node.globalConditions).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    name: "hair",
-                    value: "black"
+                    name: "key",
+                    value: "value"
                 }),
                 expect.objectContaining({
-                    name: "age",
+                    name: "number",
                     value: 14
                 })
             ])

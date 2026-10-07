@@ -5,7 +5,7 @@ import { PortraitNode } from "../portrait-node";
 
 describe("generate()", () => {
     it("generates a file for a portrait node", () => { 
-        const node = new PortraitNode("cyborg");
+        const node = new PortraitNode("human");
         node.usePortraits(
             new PortraitDirectory(
                 "default",

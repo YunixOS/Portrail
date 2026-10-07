@@ -1,6 +1,5 @@
 import { Clause } from "@yunixos/paradoxical";
 import { PortraitNode } from "../portrait-node";
-import { ScopeEntity } from "../scope-entity";
 import { resolve } from "./condition-resolver";
 
 function createNode(
