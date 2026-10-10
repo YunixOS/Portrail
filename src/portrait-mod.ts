@@ -3,11 +3,56 @@ import { PortraitGroup } from "./portrait-group";
 import path from "node:path";
 import { PortraitSet } from "./portrait-set";
 
+/**
+* Represents a portrait mod. The portrait mod can contain categories,
+* sets, and groups of portraits.
+*
+* A portrait mod is assigned to a chosen directory within the filesystem that
+* its contents will be written to.
+*
+* The portrait mod directory should already have a `gfx/models/portraits`
+* directory populated with dds files. The files should be nested and structured
+* according to the desired arrangement of {@link PortraitGroup | portrait groups}
+* and {@link PortraitNode | portrait nodes}.
+*
+* @example
+* ```ts
+* const mod = new PortraitMod(
+*     "/path/to/mod"
+* );
+*
+* mod.createPortraitCategory(
+*     "my_category",
+*     "My Category"
+* );
+*
+* mod.write();
+* ```
+*/
 export class PortraitMod {
+    /**
+    * The portrait models directory of the mod.
+    * Generated automatically from {@link dir}.
+    */
     portraitDir: string
+    
+    /**
+    * The portrait_categories directory of the mod.
+    * Generated automatically from {@link dir}.
+    */
     categoryDir: string
+    
+    /**
+    * The portrait_sets directory of the mod.
+    * Generated automatically from {@link dir}.
+    */
     setDir: string
 
+    /**
+    * Creates a portrait mod.
+    *
+    * @param dir - The mods root directory. Can be absolute or relative.
+    */
     constructor(
         public readonly dir: string
     ) {
@@ -16,21 +61,24 @@ export class PortraitMod {
             "gfx",
             "models",
             "portraits"
-        )
+        );
         
         this.categoryDir = path.join(
             this.dir,
             "common",
             "portrait_categories"
-        )
+        );
         
         this.setDir = path.join(
             this.dir,
             "common",
             "portrait_sets"
-        )
+        );
     }
 
+    /**
+     * All of the mods {@link PortraitCategory | portrait categories}
+     */
     portraitCategories: PortraitCategory[] = [];
     
     createPortraitCategory(id: string, name: string) {
@@ -41,6 +89,9 @@ export class PortraitMod {
         return portraitCategory;
     }
     
+    /**
+     * All of the mods {@link PortraitSet | portrait sets}
+     */
     portraitSets: PortraitSet[] = [];
     
     createPortraitSet(id: string, speciesClass: string) {

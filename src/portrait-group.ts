@@ -238,7 +238,9 @@ export class PortraitGroup {
     }
     
     /**
-     * Creates a Paradoxical ModFile for each {@link PortraitNode} in the group.
+     * Creates a Paradoxical
+     * {@link https://yunixos.github.io/Paradoxical/classes/ModFile.html | ModFile}
+     * for each {@link PortraitNode} in the group.
      *
      * @param modPath - The root path of the mod to generate files for.
      * @returns The generated mod files.
@@ -260,7 +262,7 @@ export class PortraitGroup {
     }
     
     /**
-     * Generates and writes the node files for this portrait group to disk.
+     * Generates and writes the files for this portrait group to disk.
      *
      * @param modPath - The root path of the mod.
      *
