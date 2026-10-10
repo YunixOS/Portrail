@@ -3,8 +3,8 @@ Portrail is a library built on [Paradoxical](https://github.com/YunixOS/Paradoxi
 The documentation is currently rather sparse, but I am working on it.
 
 ## Features
-- Automatically handles importing of .dds files and assigns them based on user input.
-- Directory based nodes that enabled fine grained control of portrait triggers.
+- Automatically handles importing of dds image files and assigns them based on user input.
+- Directory based nodes that enable fine grained control of portrait triggers.
 - Resolver that automatically determines inherited and negative triggers for portraits based on relationships between those that have been assigned to other nodes.
 
 # Install Methods
@@ -23,7 +23,7 @@ Download the pre-built package from the releases section and copy it into the ro
 
 # Getting Started
 ## 1. Populate portraits directory
-Before doing anything with Portrail, make sure you have a folder created for your mod. You will need to have your .dds files (portrait images) populating the gfx/models/portraits directory within your mod folder. It is recommended that you organise portraits based on the portrait groups you intend on creating. If you are only going to have one portrait group, you could for example just create a folder inside gfx/models/portraits with the name of the group and populate it with your .dds files. The resulting id of the group will be what you set the folder name to (though special characters will be replaced with underscores), so make sure it is unique enough to reduce the risk of potential compatability issues with other mods or the base game. If you want to have certain special portraits with their own triggers and such, you can create subfolders within the group folder (called "portrait nodes" in Portrail) which you can later add custom triggers to (e.g make them appear for only scientist leaders). Portraits placed in the root directory of the group are part of the "default" portrait node, and the first portrait in this node will be used as the default portrait of the group (the one used as the icon for the group in empire creation) if no specific default portrait is manually specified. If you have no portraits in the default node (e.g your folder structure involves all .dds files being within other nodes) you must manually assign a default portrait by passing an extra argument to the createPortraitGroup method.
+Before doing anything with Portrail, make sure you have a folder created for your mod. You will need to have your dds files (portrait images) populating the gfx/models/portraits directory within your mod folder. It is recommended that you organise portraits based on the portrait groups you intend on creating. If you are only going to have one portrait group, you could for example just create a folder inside gfx/models/portraits with the name of the group and populate it with your dds files. The resulting id of the group will be what you set the folder name to (though special characters will be replaced with underscores), so make sure it is unique enough to reduce the risk of potential compatability issues with other mods or the base game. If you want to have certain special portraits with their own triggers and such, you can create subfolders within the group folder (called "portrait nodes" in Portrail) which you can later add custom triggers to (e.g make them appear for only scientist leaders). Portraits placed in the root directory of the group are part of the "default" portrait node, and the first portrait in this node will be used as the default portrait of the group (the one used as the icon for the group in empire creation) if no specific default portrait is manually specified. If you have no portraits in the default node (e.g your folder structure involves all dds files being within other nodes) you must manually assign a default portrait by passing an extra argument to the createPortraitGroup method.
 
 ## 2. Import Portrail
 Once Portrail is installed and your portraits directory is organised as intended, you can create a new JS/TS file and add the following import (make sure you are using ES6 modules):
@@ -71,7 +71,7 @@ set.addPortraitGroups(mod.portraitGroups);
 Congratulations, you now have a portrait group assigned to a directory in your mod!
 
 ## 5.1. (optional)
-If you want to get a bit more advanced, you can create custom portrait nodes by creating subdirectories within your portrait groups directory and populating them with .dds portraits of your choosing. When creating the portrait group, it will automatically find all the subdirectories and assign portrait nodes to them which you can manually add special conditions to, shaping how and when they appear in game with more control.
+If you want to get a bit more advanced, you can create custom portrait nodes by creating subdirectories within your portrait groups directory and populating them with dds portraits of your choosing. When creating the portrait group, it will automatically find all the subdirectories and assign portrait nodes to them which you can manually add special conditions to, shaping how and when they appear in game with more control.
 
 For example, lets say you created a subdirectory called "leaders" within your portrait group directory, and another directory within "leaders" called "scientist". You then could for example populate this with special portraits for scientists. You can then simply use the node() method of your portrait group to find this node and add the conditions you wish.
 

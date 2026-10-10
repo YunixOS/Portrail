@@ -34,19 +34,19 @@ export class PortraitMod {
     * The portrait models directory of the mod.
     * Generated automatically from {@link dir}.
     */
-    portraitDir: string
+    readonly portraitDir: string
     
     /**
     * The portrait_categories directory of the mod.
     * Generated automatically from {@link dir}.
     */
-    categoryDir: string
+    readonly categoryDir: string
     
     /**
     * The portrait_sets directory of the mod.
     * Generated automatically from {@link dir}.
     */
-    setDir: string
+    readonly setDir: string
 
     /**
     * Creates a portrait mod.
