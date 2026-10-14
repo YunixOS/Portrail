@@ -8,6 +8,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "portrail": "file:portrail-1.0.0.tgz"
+    "portrail": "file:portrail-0.0.1.tgz"
   }
 }
